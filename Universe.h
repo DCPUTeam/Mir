@@ -12,11 +12,13 @@
 
 class Universe
 {
-
 private:
     std::list<Actor*> m_Actors;
     std::list<Ship*> m_Ships; 
     Network::Controller* m_Controller;
+
+public:
+    Universe() { }
 };
 
 #endif

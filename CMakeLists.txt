@@ -20,6 +20,8 @@ add_executable(dtgame
     Player.cpp
     Ship.h
     Ship.cpp
+    Spatial.h
+    Spatial.cpp
 )
 add_executable(dtgame-server
     Server/Main.cpp
