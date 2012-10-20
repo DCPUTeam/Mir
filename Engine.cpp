@@ -31,12 +31,13 @@ void Engine::Run()
     if (!this->m_WindowOpen)
     {
         // Open an 800x600 that matches the parameters as closely as possible.
-        this->m_GLFWWindow = glfwCreateWindow(800, 600, GLFW_WINDOWED, "DCPU-16 Game Simulation", NULL);
+        this->m_GLFWWindow = glfwCreateWindow(800, 600, GLFW_WINDOWED, "DCPU-16 Game Simulation", 0);
         this->m_WindowOpen = true;
     }
 
     // Render the game.
     glfwMakeContextCurrent(this->m_GLFWWindow);
+    glfwPollEvents();
     RenderingEngine::Render(*this->m_Universe);
     glfwSwapBuffers(this->m_GLFWWindow);
 
