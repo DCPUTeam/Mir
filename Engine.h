@@ -7,11 +7,16 @@
 
 #include <GL/glfw3.h>
 #include "Universe.h"
+#include "Player.h"
+#include "Network/Controller.h"
 
 class Engine
 {
 private:
     Universe* m_Universe;
+    Player* m_Player;
+    Network::Controller* m_Controller;
+
     GLFWwindow m_GLFWWindow;
     bool m_Running;
     bool m_WindowOpen;
