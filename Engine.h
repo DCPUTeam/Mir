@@ -6,22 +6,22 @@
 #define __DCPU_GAME_ENGINE_H
 
 #include <GL/glfw3.h>
-#include "Universe.h"
-#include "Player.h"
+#include "CachedUniverse.h"
+#include "CachedPlayer.h"
 #include "Network/Controller.h"
 
 class Engine
 {
 private:
-    Universe* m_Universe;
-    Player* m_Player;
-    Network::Controller* m_Controller;
+    CachedUniverse* m_Universe;
+    CachedPlayer* m_Player;
+    Network::Controller& m_Controller;
 
     GLFWwindow m_GLFWWindow;
     bool m_Running;
     bool m_WindowOpen;
 public:
-    Engine();
+    Engine(Network::Controller& controller);
     ~Engine();
     bool IsRunning();
     void Run();

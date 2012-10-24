@@ -3,8 +3,12 @@ project(dtgame)
 
 find_package(OpenGL REQUIRED)
 add_library(dtgame-network STATIC
+    Network/Message.h
     Network/Message.cpp
+    Network/Controller.h
     Network/Controller.cpp
+    Network/IdentifiableObject.h
+    Network/IdentifiableObject.cpp
 )
 add_executable(dtgame
     Main.cpp
@@ -12,19 +16,29 @@ add_executable(dtgame
     Engine.cpp
     RenderingEngine.h
     RenderingEngine.cpp
-    Universe.h
-    Universe.cpp
-    Actor.h
-    Actor.cpp
-    Player.h
-    Player.cpp
-    Ship.h
-    Ship.cpp
-    Spatial.h
-    Spatial.cpp
+    CachedUniverse.h
+    CachedUniverse.cpp
+    CachedActor.h
+    CachedActor.cpp
+    CachedPlayer.h
+    CachedPlayer.cpp
+    CachedShip.h
+    CachedShip.cpp
+    CachedSpatial.h
+    CachedSpatial.cpp
 )
 add_executable(dtgame-server
     Server/Main.cpp
+    Server/Universe.h
+    Server/Universe.cpp
+    Server/Actor.h
+    Server/Actor.cpp
+    Server/Player.h
+    Server/Player.cpp
+    Server/Ship.h
+    Server/Ship.cpp
+    Server/Spatial.h
+    Server/Spatial.cpp
 )
 include_directories(
     ${GLFW_SOURCE_DIR}/include

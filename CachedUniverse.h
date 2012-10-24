@@ -6,19 +6,19 @@
 #define __DCPU_GAME_UNIVERSE_H
 
 #include <list>
-#include "Actor.h"
-#include "Ship.h"
+#include "CachedActor.h"
+#include "CachedShip.h"
 #include "Network/Controller.h"
 
-class Universe
+class CachedUniverse
 {
 private:
-    std::list<Actor*> m_Actors;
-    std::list<Ship*> m_Ships; 
+    std::list<CachedActor*> m_CachedActors;
+    std::list<CachedShip*> m_CachedShips; 
     Network::Controller* m_Controller;
 
 public:
-    Universe() { }
+    CachedUniverse() { }
 };
 
 #endif

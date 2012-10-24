@@ -2,16 +2,20 @@
  * The class declaration for the Engine.
  */
 
+#include <cassert>
 #include <GL/glfw3.h>
 #include "Engine.h"
 #include "RenderingEngine.h"
 
-Engine::Engine()
+Engine::Engine(Network::Controller& controller)
+    : m_Controller(controller)
 {
     this->m_Running = true;
     this->m_WindowOpen = false;
-    this->m_Universe = new Universe();
-    this->m_Player = new Player();
+    this->m_Universe = (CachedUniverse*)this->m_Controller.Find("universe");
+    this->m_Player = (CachedPlayer*)this->m_Controller.Find("player");
+    assert(this->m_Universe != NULL);
+    assert(this->m_Player != NULL);
 
     glfwInit();
 }
@@ -32,7 +36,7 @@ void Engine::Run()
     if (!this->m_WindowOpen)
     {
         // Open an 800x600 that matches the parameters as closely as possible.
-        this->m_GLFWWindow = glfwCreateWindow(800, 600, GLFW_WINDOWED, "DCPU-16 Game Simulation", 0);
+        this->m_GLFWWindow = glfwCreateWindow(800, 600, GLFW_WINDOWED, "Mir", 0);
         this->m_WindowOpen = true;
         glfwMakeContextCurrent(this->m_GLFWWindow);
     }

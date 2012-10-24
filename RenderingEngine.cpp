@@ -59,7 +59,7 @@ void Draw(void)
     }
 }
 
-void RenderingEngine::Render(Player& player, Universe& universe)
+void RenderingEngine::Render(CachedPlayer& player, CachedUniverse& universe)
 {
     // set the projection matrix to a normal frustum with a max depth of 50
     glMatrixMode(GL_PROJECTION);

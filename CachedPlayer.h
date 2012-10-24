@@ -5,15 +5,15 @@
 #ifndef __DCPU_GAME_PLAYER_H
 #define __DCPU_GAME_PLAYER_H
 
-#include "Spatial.h"
-#include "Actor.h"
+#include "CachedSpatial.h"
+#include "CachedActor.h"
 
-class Player : public Spatial
+class CachedPlayer : public CachedSpatial
 {
 private:
-    Actor* m_Actor;
+    CachedActor* m_Actor;
 public:
-    Player() :
+    CachedPlayer() :
       m_Actor(NULL) {}
 };
 

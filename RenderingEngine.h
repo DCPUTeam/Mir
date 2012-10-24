@@ -5,13 +5,13 @@
 #ifndef __DCPU_GAME_RENDERING_ENGINE_H
 #define __DCPU_GAME_RENDERING_ENGINE_H
 
-#include "Universe.h"
-#include "Player.h"
+#include "CachedUniverse.h"
+#include "CachedPlayer.h"
 
 class RenderingEngine
 {
 public:
-    static void Render(Player& player, Universe& universe);
+    static void Render(CachedPlayer& player, CachedUniverse& universe);
 };
 
 #endif
