@@ -4,12 +4,6 @@
 
 #include <cassert>
 #include "Controller.h"
-#ifdef WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-#include <WinSock2.h>
-#undef SendMessage
-#endif
 
 namespace Network 
 {
@@ -17,16 +11,13 @@ namespace Network
         : m_Mode(mode), m_ConnectionAddress(address), m_ConnectionPort(port), ServerRunning(true)
     {
         // Initialize the local object mappings.
-        m_LocalObjects = std::map<std::string, IdentifiableObject*>();
+        this->m_LocalObjects = std::map<std::string, IdentifiableObject*>();
 
         // Make the connection.
-        if (mode == ControllerMode::Server)
+        if (this->m_Mode == ControllerMode::Server)
         {
-            int sockfd;
-
-            sockfd = socket(AF_INET, SOCK_STREAM, 0);
-            assert(sockfd >= 0);
-            memset(
+            this->m_IOService = new boost::asio::io_service();
+            this->m_TCPServer = new Internal::tcp_server(*this, *this->m_IOService);
         }
     }
 
@@ -34,10 +25,26 @@ namespace Network
     {
         std::string id = object.GetIdentifier();
         std::string data = message.Serialize();
+
+        if (this->m_Mode == ControllerMode::Server)
+        {
+            // Broadcast message to all connected clients.
+
+        }
     }
     
+    void Controller::ReceiveData(size_t length, char* data)
+    {
+        // Ask the message class to deserialize the raw data.
+
+    }
+
     void Controller::Synchronise()
     {
+        if (this->m_Mode == ControllerMode::Server)
+        {
+            this->m_IOService->poll_one();
+        }
     }
     
     void Controller::Register(IdentifiableObject& object)

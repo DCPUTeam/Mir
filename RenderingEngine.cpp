@@ -4,12 +4,6 @@
 
 #include <GL/glfw3.h>
 #include "RenderingEngine.h"
-#ifdef WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#endif
-#include <GL/GL.h>
-#include <GL/glu.h>
 
 /*
  * Example code taken from http://content.gpwiki.org/index.php/GLFW:Tutorials:Basics#An_Example
