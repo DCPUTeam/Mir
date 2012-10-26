@@ -6,8 +6,9 @@
 
 namespace Server
 {
-    void Player::ReceiveMessage(Message& message)
+    void Player::ReceiveMessage(Network::Message& message)
     {
         // Handle messages.
+        std::cout << "NOTE: Player just received a message!" << std::endl;
     }
 }

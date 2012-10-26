@@ -30,7 +30,7 @@ void Draw_Square(float red, float green, float blue)
     }
     glEnd();
 }
- 
+
 void Draw(void)
 {
     // reset view matrix
@@ -44,11 +44,12 @@ void Draw(void)
     // squares end up in a circle
     int i = 0, squares = 15;
     float red = 0, blue = 1;
-    for (; i < squares; ++i){
-        glRotatef(360.0/squares, 0, 0, 1);
+    for (; i < squares; ++i)
+    {
+        glRotatef(360.0 / squares, 0, 0, 1);
         // colors change for each square
-        red += 1.0/12;
-        blue -= 1.0/12;
+        red += 1.0 / 12;
+        blue -= 1.0 / 12;
         Draw_Square(red, .6, blue);
     }
 }
@@ -66,11 +67,11 @@ void RenderingEngine::Render(CachedPlayer& player, CachedUniverse& universe)
     static double old_time = glfwGetTime();
     // calculate time elapsed, and the amount by which stuff rotates
     double current_time = glfwGetTime(),
-        delta_rotate = (current_time - old_time) * rotations_per_tick * 360;
+           delta_rotate = (current_time - old_time) * rotations_per_tick * 360;
     old_time = current_time;
     // z axis always rotates
     rotate_z += delta_rotate;
- 
+
     // clear the buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // draw the figure

@@ -26,6 +26,15 @@ add_library(mir-network STATIC
     Network/Internal/tcp_server_connection.cpp
     Network/Internal/tcp_server.h
     Network/Internal/tcp_server.cpp
+    Network/Internal/tcp_client_connection.h
+    Network/Internal/tcp_client_connection.cpp
+    Network/Internal/tcp_client.h
+    Network/Internal/tcp_client.cpp
+    Network/CreateMessage.h
+    Network/CreateMessage.cpp
+    Network/ObjectTranslation.h
+    Network/PlayerJoinMessage.h
+    Network/PlayerJoinMessage.cpp
 )
 add_executable(mir
     Main.cpp
@@ -43,6 +52,8 @@ add_executable(mir
     CachedShip.cpp
     CachedSpatial.h
     CachedSpatial.cpp
+    ClientObjectTranslation.h
+    ClientObjectTranslation.cpp
 )
 add_executable(mir-server
     Server/Main.cpp
@@ -56,6 +67,8 @@ add_executable(mir-server
     Server/Ship.cpp
     Server/Spatial.h
     Server/Spatial.cpp
+    Server/ServerObjectTranslation.h
+    Server/ServerObjectTranslation.cpp
 )
 target_link_libraries(mir-network
     ${Boost_LIBRARIES}

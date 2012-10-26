@@ -11,14 +11,14 @@
 
 namespace Server
 {
-    class Player : public Spatial, public IdentifiableObject
+    class Player : public Spatial, public Network::IdentifiableObject
     {
     private:
         Actor* m_Actor;
     public:
-        Player(Controller& controller, std::string identifier) :
-          IdentifiableObject(controller, identifier), m_Actor(NULL) {}
-        virtual void ReceiveMessage(Message& message);
+        Player(Network::Controller& controller, std::string identifier) :
+            IdentifiableObject(controller, identifier), m_Actor(NULL) {}
+        virtual void ReceiveMessage(Network::Message& message);
     };
 }
 

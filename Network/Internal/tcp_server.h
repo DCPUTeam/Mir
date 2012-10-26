@@ -15,6 +15,7 @@ namespace Network
     }
 }
 
+#include <string>
 #include <iostream>
 #include <boost/array.hpp>
 #include <boost/asio.hpp>
@@ -29,14 +30,17 @@ namespace Network
         class tcp_server
         {
         public:
-            tcp_server(Controller& controller, boost::asio::io_service& io_service);
+            tcp_server(Controller& controller, boost::asio::io_service& io_service, int port);
+            void broadcast(std::string data);
         private:
             void start_accept();
-            void handle_accept(tcp_connection::pointer new_connection,
-                const boost::system::error_code& error);
+            void handle_accept(tcp_server_connection::pointer new_connection,
+                               const boost::system::error_code& error);
 
             tcp::acceptor m_Acceptor;
             Controller& m_Controller;
+
+            std::list<tcp_server_connection::pointer> m_Clients;
         };
     }
 }

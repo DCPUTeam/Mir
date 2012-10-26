@@ -21,7 +21,7 @@ namespace Network
     {
         return this->m_Controller;
     }
-    
+
     std::string IdentifiableObject::GetIdentifier()
     {
         return this->m_Identifier;

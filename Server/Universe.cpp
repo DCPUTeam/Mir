@@ -9,5 +9,6 @@ namespace Server
     void Universe::ReceiveMessage(Message& message)
     {
         // Handle messages.
+        std::cout << "NOTE: Universe just received a message!" << std::endl;
     }
 }

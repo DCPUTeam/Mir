@@ -6,16 +6,17 @@
 #include <GL/glfw3.h>
 #include "Engine.h"
 #include "RenderingEngine.h"
+#include "Network/PlayerJoinMessage.h"
 
 Engine::Engine(Network::Controller& controller)
     : m_Controller(controller)
 {
     this->m_Running = true;
     this->m_WindowOpen = false;
-    this->m_Universe = (CachedUniverse*)this->m_Controller.Find("universe");
-    this->m_Player = (CachedPlayer*)this->m_Controller.Find("player");
-    assert(this->m_Universe != NULL);
-    assert(this->m_Player != NULL);
+    this->m_Universe = NULL; //(CachedUniverse*)this->m_Controller.Find("universe");
+    this->m_Player = NULL; //(CachedPlayer*)this->m_Controller.Find("player");
+    //assert(this->m_Universe != NULL);
+    //assert(this->m_Player != NULL);
 
     glfwInit();
 }
@@ -43,27 +44,41 @@ void Engine::Run()
 
     // Render the game.
     glfwPollEvents();
-    RenderingEngine::Render(*this->m_Player, *this->m_Universe);
+    if (this->m_Player != NULL && this->m_Universe != NULL)
+        RenderingEngine::Render(*this->m_Player, *this->m_Universe);
     glfwSwapBuffers(this->m_GLFWWindow);
 
     // Handle player movement.
-    if (glfwGetKey(this->m_GLFWWindow, GLFW_KEY_UP))
-        this->m_Player->Z += 1;
-    if (glfwGetKey(this->m_GLFWWindow, GLFW_KEY_DOWN))
-        this->m_Player->Z -= 1;
-    if (glfwGetKey(this->m_GLFWWindow, GLFW_KEY_LEFT))
-        this->m_Player->X += 1;
-    if (glfwGetKey(this->m_GLFWWindow, GLFW_KEY_RIGHT))
-        this->m_Player->X -= 1;
+    if (this->m_Player != NULL)
+    {
+        if (glfwGetKey(this->m_GLFWWindow, GLFW_KEY_UP))
+            this->m_Player->Z += 1;
+        if (glfwGetKey(this->m_GLFWWindow, GLFW_KEY_DOWN))
+            this->m_Player->Z -= 1;
+        if (glfwGetKey(this->m_GLFWWindow, GLFW_KEY_LEFT))
+            this->m_Player->X += 1;
+        if (glfwGetKey(this->m_GLFWWindow, GLFW_KEY_RIGHT))
+            this->m_Player->X -= 1;
+    }
+
+    // Test player join.
+    if (glfwGetKey(this->m_GLFWWindow, GLFW_KEY_SPACE))
+    {
+        Network::PlayerJoinMessage message;
+        this->m_Controller.SendMessage(message);
+    }
 
     // If the user has pressed the escape key, close the program.
     // In future, this close handler will be much more advanced!
     if (glfwGetKey(this->m_GLFWWindow, GLFW_KEY_ESC) ||
-        glfwGetWindowParam(this->m_GLFWWindow, GLFW_CLOSE_REQUESTED))
+            glfwGetWindowParam(this->m_GLFWWindow, GLFW_CLOSE_REQUESTED))
     {
         // Exit.  The window will be closed by Engine::Cleanup.
         this->m_Running = false;
     }
+
+    // Synchronise the network.
+    this->m_Controller.Synchronise();
 }
 
 void Engine::Cleanup()

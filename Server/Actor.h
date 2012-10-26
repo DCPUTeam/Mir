@@ -8,13 +8,14 @@
 #include "Spatial.h"
 #include "../Network/IdentifiableObject.h"
 
-using namespace Network;
-
 namespace Server
 {
-    class Actor : public Spatial, public IdentifiableObject
+    class Actor : public Spatial, public Network::IdentifiableObject
     {
- 
+    public:
+        Actor(Network::Controller& controller, std::string identifier)
+            : Network::IdentifiableObject(controller, identifier) {}
+        virtual void ReceiveMessage(Network::Message& message);
     };
 }
 #endif

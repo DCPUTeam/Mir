@@ -2,8 +2,8 @@
  * The class declaration for the network server connection.
  */
 
-#ifndef __DCPU_GAME_NETWORKING_INTERNAL_TCP_CONNECTION_H
-#define __DCPU_GAME_NETWORKING_INTERNAL_TCP_CONNECTION_H
+#ifndef __DCPU_GAME_NETWORKING_INTERNAL_tcp_server_connection_H
+#define __DCPU_GAME_NETWORKING_INTERNAL_tcp_server_connection_H
 
 namespace Network
 {
@@ -11,7 +11,7 @@ namespace Network
 
     namespace Internal
     {
-        class tcp_connection;
+        class tcp_server_connection;
     }
 }
 
@@ -28,17 +28,18 @@ namespace Network
 {
     namespace Internal
     {
-        class tcp_connection
-            : public boost::enable_shared_from_this<tcp_connection>
+        class tcp_server_connection
+            : public boost::enable_shared_from_this<tcp_server_connection>
         {
         public:
-            typedef boost::shared_ptr<tcp_connection> pointer;
+            typedef boost::shared_ptr<tcp_server_connection> pointer;
 
             static pointer create(Controller& controller, boost::asio::io_service& io_service);
             tcp::socket& socket();
             void start();
+            void broadcast(std::string data);
         private:
-            tcp_connection(Controller& controller, boost::asio::io_service& io_service);
+            tcp_server_connection(Controller& controller, boost::asio::io_service& io_service);
             void read_header();
             void read_message();
             void handle_header(const boost::system::error_code& error);
