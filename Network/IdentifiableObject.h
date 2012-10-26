@@ -11,12 +11,13 @@ namespace Network
 }
 
 #include <string>
+#include <boost/noncopyable.hpp>
 #include "Message.h"
 #include "Controller.h"
 
 namespace Network
 {
-    class IdentifiableObject
+    class IdentifiableObject : private boost::noncopyable
     {
     private:
         Controller& m_Controller;

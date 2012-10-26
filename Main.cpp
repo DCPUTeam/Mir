@@ -11,8 +11,8 @@ using namespace Network;
 int main(int argc, char** argv)
 {
     ClientObjectTranslation translation;
-    Controller controller = Controller(ControllerMode::Client, translation, "127.0.0.1", 5055);
-    Engine engine = Engine(controller);
+    Controller controller(ControllerMode::Client, translation, "127.0.0.1", 5055);
+    Engine engine(controller);
 
     while (engine.IsRunning())
     {

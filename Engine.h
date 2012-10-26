@@ -6,11 +6,12 @@
 #define __DCPU_GAME_ENGINE_H
 
 #include <GL/glfw3.h>
+#include <boost/noncopyable.hpp>
 #include "CachedUniverse.h"
 #include "CachedPlayer.h"
 #include "Network/Controller.h"
 
-class Engine
+class Engine : private boost::noncopyable
 {
 private:
     CachedUniverse* m_Universe;

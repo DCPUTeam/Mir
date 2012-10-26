@@ -25,10 +25,30 @@ namespace Network
         ///
         void tcp_server_connection::broadcast(std::string data)
         {
-            boost::asio::async_write(this->m_Socket, boost::asio::buffer(data),
-                boost::bind(&tcp_server_connection::handle_write, shared_from_this(),
-                    boost::asio::placeholders::error,
-                    boost::asio::placeholders::bytes_transferred));
+            std::cout << "Pushing new message onto deque for sending to client." << std::endl;
+
+            bool write_in_progress = !this->m_DataMessages.empty();
+
+            // Create header information.
+            if (data.length() > UINT16_MAX)
+            {
+                std::cerr << "ERROR: Packet is larger than UINT16_MAX and can not be sent." << std::endl;
+                return;
+            }
+            uint16_t l = data.length();
+            char* lc = (char*)&l;
+            std::string header = std::string(lc, sizeof(uint16_t));
+            std::string combined = header + data;
+
+            // Push message.
+            this->m_DataMessages.push_back(combined);
+            if (!write_in_progress)
+            {
+                boost::asio::async_write(this->m_Socket, boost::asio::buffer(this->m_DataMessages.front()),
+                    boost::bind(&tcp_server_connection::handle_write, this, 
+                        boost::asio::placeholders::error,
+                        boost::asio::placeholders::bytes_transferred));
+            }
         }
 
         ///
@@ -133,7 +153,22 @@ namespace Network
         void tcp_server_connection::handle_write(const boost::system::error_code& error,
                                           size_t bytes_transferred)
         {
-            std::cout << "Sent " << bytes_transferred << " to a client." << std::endl;
+            std::cout << "Sent " << bytes_transferred << " bytes to remote client." << std::endl;
+
+            if (!error)
+            {
+                this->m_DataMessages.pop_front();
+                if (!this->m_DataMessages.empty())
+                {
+                    boost::asio::async_write(this->m_Socket, boost::asio::buffer(this->m_DataMessages.front()),
+                        boost::bind(&tcp_server_connection::handle_write, this, 
+                            boost::asio::placeholders::error,
+                            boost::asio::placeholders::bytes_transferred));
+                }
+            }
+            else
+                // FIXME: this->start_close();
+                return;
         }
     }
 }

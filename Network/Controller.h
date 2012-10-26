@@ -12,6 +12,7 @@ namespace Network
 
 #include <map>
 #include <string>
+#include <boost/noncopyable.hpp>
 #include "IdentifiableObject.h"
 #include "Internal/tcp_server_connection.h"
 #include "Internal/tcp_server.h"
@@ -31,10 +32,10 @@ namespace Network
         };
     }
 
-    class Controller
+    class Controller : private boost::noncopyable
     {
     private:
-        std::map<std::string, IdentifiableObject*> m_LocalObjects;
+        std::map<std::string, IdentifiableObject*>* m_LocalObjects;
         ControllerMode::Type m_Mode;
         std::string m_ConnectionAddress;
         boost::asio::io_service* m_IOService;
@@ -48,6 +49,7 @@ namespace Network
         bool ServerRunning;
 
         Controller(ControllerMode::Type mode, ObjectTranslation& translation, std::string address, int port);
+        ~Controller();
         void SendMessage(Message& message);
         void SendMessage(IdentifiableObject& object, Message& message);
         void ReceiveData(size_t length, char* data);

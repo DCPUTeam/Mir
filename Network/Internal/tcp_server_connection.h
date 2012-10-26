@@ -16,6 +16,7 @@ namespace Network
 }
 
 #include <iostream>
+#include <deque>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
@@ -49,6 +50,7 @@ namespace Network
             tcp::socket m_Socket;
             std::string m_Message;
             Controller& m_Controller;
+            std::deque<std::string> m_DataMessages;
 
             uint16_t m_PacketLength;
             char* m_PacketData;

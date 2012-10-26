@@ -40,6 +40,8 @@ namespace Network
         ///
         void tcp_client::start_write(std::string data)
         {
+            std::cout << "Pushing new message onto deque for sending to server." << std::endl;
+
             bool write_in_progress = !this->m_DataMessages.empty();
 
             // Create header information.

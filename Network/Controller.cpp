@@ -2,6 +2,7 @@
  * The class definition for the network controller.
  */
 
+#include <exception>
 #include <cassert>
 #include <sstream>
 #include "Controller.h"
@@ -14,7 +15,7 @@ namespace Network
         : m_Mode(mode), m_ConnectionAddress(address), m_ConnectionPort(port), ServerRunning(true), m_ObjectTranslation(translation)
     {
         // Initialize the local object mappings.
-        this->m_LocalObjects = std::map<std::string, IdentifiableObject*>();
+        this->m_LocalObjects = new std::map<std::string, IdentifiableObject*>();
 
         // Make the connection.
         this->m_IOService = new boost::asio::io_service();
@@ -30,6 +31,12 @@ namespace Network
             tcp::resolver::iterator iterator = resolver.resolve(query);
             this->m_TCPClient = new Internal::tcp_client(*this, *this->m_IOService, iterator);
         }
+    }
+    
+    Controller::~Controller()
+    {
+        // FIXME: Free memory inside the map first.
+        delete this->m_LocalObjects;
     }
 
     void Controller::SendMessage(IdentifiableObject& object, Message& message)
@@ -119,6 +126,24 @@ namespace Network
 
     void Controller::ReceiveMessage(Network::Message& message)
     {
+        if (typeid(message) == typeid(PlayerJoinMessage))
+        {
+            // Here we need to transmit the state of the universe to the client
+            // the message came from.
+            // TODO: Add source tracking into Message class and a send to one
+            // target option for tcp_server.
+            std::cout << "Server received a message of type " << typeid(message).name() << "!" << std::endl;
+
+            CreateMessage create;
+            create.Identifier = "blah1234567";
+            create.Type = "Actor";
+            this->SendMessage(create);
+        }
+        else
+        {
+            std::cout << "Client received a message of type " << typeid(message).name() << "!" << std::endl;
+        }
+        
         std::cerr << "FIXME Controller::ReceiveMessage!" << std::endl;
     }
 
@@ -129,20 +154,20 @@ namespace Network
 
     void Controller::Register(IdentifiableObject& object)
     {
-        this->m_LocalObjects.insert(
+        this->m_LocalObjects->insert(
             std::pair<std::string, IdentifiableObject*>(object.GetIdentifier(), &object)
         );
     }
 
     void Controller::Unregister(IdentifiableObject& object)
     {
-        this->m_LocalObjects.erase(object.GetIdentifier());
+        this->m_LocalObjects->erase(object.GetIdentifier());
     }
 
     IdentifiableObject* Controller::Find(std::string identifier)
     {
-        for (std::map<std::string, IdentifiableObject*>::const_iterator i = this->m_LocalObjects.begin();
-                i != this->m_LocalObjects.end(); i++)
+        for (std::map<std::string, IdentifiableObject*>::const_iterator i = this->m_LocalObjects->begin();
+                i != this->m_LocalObjects->end(); i++)
         {
             if (i->first == identifier)
                 return i->second;
