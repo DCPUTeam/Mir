@@ -75,7 +75,7 @@ namespace Network
         // Pull out the message type.
         std::string message_type = message.substr(0, at);
         message = message.substr(at + 1);
-        
+
         // Find the second ':'.
         at = message.find('\1');
         if (at == std::string::npos)
@@ -89,6 +89,10 @@ namespace Network
         // based on the type.
         if (message_type == typeid(CreateMessage).name())
         {
+            // Check whether it's valid for this mode.
+            if (this->m_Mode != ControllerMode::Client)
+                return;
+
             // This is a special creation message; the owner ID
             // is currently unused, but we need to create the new
             // object, depending on it's type.  First however, we need
@@ -102,6 +106,10 @@ namespace Network
         }
         else if (message_type == typeid(PlayerJoinMessage).name())
         {
+            // Check whether it's valid for this mode.
+            if (this->m_Mode != ControllerMode::Server)
+                return;
+
             // Deserialize player join message.
             PlayerJoinMessage player_join;
             player_join.Deserialize(message);
