@@ -13,7 +13,9 @@ namespace Network
     class CreateMessage : public Message
     {
     public:
+#ifdef MIR_NETWORK_CONTROLLER_INTERNALS
         CreateMessage();
+#endif
         CreateMessage(std::string type, std::string identifier);
         virtual std::string Serialize();
         virtual void Deserialize(std::string data);

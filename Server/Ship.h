@@ -5,16 +5,15 @@
 #ifndef __DCPU_GAME_SERVER_SHIP
 #define __DCPU_GAME_SERVER_SHIP
 
-#include "Spatial.h"
-#include "../Network/IdentifiableObject.h"
+#include "../Network/SpatialObject.h"
 
 namespace Server
 {
-    class Ship : public Spatial, public Network::IdentifiableObject
+    class Ship : public Network::SpatialObject
     {
     public:
         Ship(Network::Controller& controller, std::string identifier)
-            : Network::IdentifiableObject(controller, identifier) {}
+            : Network::SpatialObject(controller, identifier) {}
         virtual void ReceiveMessage(Network::Message& message);
     };
 }

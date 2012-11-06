@@ -2,6 +2,8 @@
  * The class definition for the network client.
  */
 
+#define MIR_NETWORK_CONTROLLER_INTERNALS
+
 #include <stdint.h>
 #include "tcp_client.h"
 #include "../Controller.h"
@@ -40,14 +42,14 @@ namespace Network
         ///
         void tcp_client::start_write(std::string data)
         {
-            std::cout << "Pushing new message onto deque for sending to server." << std::endl;
+            //std::cout << "Pushing new message onto deque for sending to server." << std::endl;
 
             bool write_in_progress = !this->m_DataMessages.empty();
 
             // Create header information.
             if (data.length() > UINT16_MAX)
             {
-                std::cerr << "ERROR: Packet is larger than UINT16_MAX and can not be sent." << std::endl;
+                this->m_Controller.Warning("Packet is larger than UINT16_MAX and can not be sent.");
                 return;
             }
             uint16_t l = data.length();
@@ -79,7 +81,7 @@ namespace Network
         ///
         void tcp_client::read_header()
         {
-            std::cout << "Attempting to read " << sizeof(this->m_PacketLength) << " bytes from remote server." << std::endl;
+            //std::cout << "Attempting to read " << sizeof(this->m_PacketLength) << " bytes from remote server." << std::endl;
 
             boost::asio::async_read(this->m_Socket,
                                     boost::asio::buffer(&this->m_PacketLength, sizeof(this->m_PacketLength)),
@@ -92,7 +94,7 @@ namespace Network
         ///
         void tcp_client::read_message()
         {
-            std::cout << "Attempting to read " << this->m_PacketLength << " bytes from remote server." << std::endl;
+            //std::cout << "Attempting to read " << this->m_PacketLength << " bytes from remote server." << std::endl;
 
             boost::asio::async_read(this->m_Socket,
                                     boost::asio::buffer(this->m_PacketData, this->m_PacketLength),
@@ -105,7 +107,8 @@ namespace Network
         ///
         void tcp_client::handle_connect(const boost::system::error_code& error)
         {
-            std::cout << "Obtained connection to remote server." << std::endl;
+            //std::cout << "Obtained connection to remote server." << std::endl;
+            this->m_Controller.SetConnectionStatus(false, true);
 
             // Read the next header.
             this->read_header();
@@ -116,7 +119,7 @@ namespace Network
         ///
         void tcp_client::handle_write(const boost::system::error_code& error, size_t bytes_transferred)
         {
-            std::cout << "Sent " << bytes_transferred << " bytes to remote server." << std::endl;
+            //std::cout << "Sent " << bytes_transferred << " bytes to remote server." << std::endl;
 
             if (!error)
             {
@@ -140,15 +143,16 @@ namespace Network
         {
             if (error)
             {
-                std::cerr << "Error while reading message data from remote server." << std::endl;
-                std::cerr << error.message() << std::endl;
+                //std::cerr << "Error while reading message data from remote server." << std::endl;
+                this->m_Controller.Error(error.message());
+                this->m_Controller.SetConnectionStatus(false, false);
 
                 // Disconnect the user by not setting up any further
                 // asynchronous operations.
                 return;
             }
 
-            std::cout << "Read header from remote server (" << this->m_PacketLength << " bytes to read)." << std::endl;
+            //std::cout << "Read header from remote server (" << this->m_PacketLength << " bytes to read)." << std::endl;
 
             // Construct an appropriate data block to hold the data.
             this->m_PacketData = new char[this->m_PacketLength];
@@ -164,14 +168,16 @@ namespace Network
         {
             if (error)
             {
-                std::cerr << "Error while reading message data from remote server." << std::endl;
+                //std::cerr << "Error while reading message data from remote server." << std::endl;
+                this->m_Controller.Error(error.message());
+                this->m_Controller.SetConnectionStatus(false, false);
 
                 // Disconnect the user by not setting up any further
                 // asynchronous operations.
                 return;
             }
 
-            std::cout << "Read " << this->m_PacketLength << " bytes from remote server." << std::endl;
+            //std::cout << "Read " << this->m_PacketLength << " bytes from remote server." << std::endl;
 
             // Make a copy of the length and data pointer (the data isn't freed;
             // that's the controller's responsibility).

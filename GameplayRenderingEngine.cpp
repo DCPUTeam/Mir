@@ -2,8 +2,10 @@
  * The class definition for the RenderingEngine.
  */
 
+#include <GL/glew.h>
 #include <GL/glfw3.h>
-#include "RenderingEngine.h"
+#include <GL/glut.h>
+#include "GameplayRenderingEngine.h"
 
 /*
  * Example code taken from http://content.gpwiki.org/index.php/GLFW:Tutorials:Basics#An_Example
@@ -12,7 +14,7 @@
 
 float rotate_y = 0,
       rotate_z = 0;
-const float rotations_per_tick = .2;
+const float rotations_per_tick = .2f;
 
 void Draw_Square(float red, float green, float blue)
 {
@@ -48,13 +50,13 @@ void Draw(void)
     {
         glRotatef(360.0 / squares, 0, 0, 1);
         // colors change for each square
-        red += 1.0 / 12;
-        blue -= 1.0 / 12;
-        Draw_Square(red, .6, blue);
+        red += 1.0f / 12;
+        blue -= 1.0f / 12;
+        Draw_Square(red, .6f, blue);
     }
 }
 
-void RenderingEngine::Render(CachedPlayer& player, CachedUniverse& universe)
+void GameplayRenderingEngine::Render(CachedPlayer& player, CachedUniverse& universe)
 {
     // set the projection matrix to a normal frustum with a max depth of 50
     glMatrixMode(GL_PROJECTION);
@@ -70,7 +72,8 @@ void RenderingEngine::Render(CachedPlayer& player, CachedUniverse& universe)
            delta_rotate = (current_time - old_time) * rotations_per_tick * 360;
     old_time = current_time;
     // z axis always rotates
-    rotate_z += delta_rotate;
+    rotate_z = (float)player.Z;
+    //rotate_z += delta_rotate;
 
     // clear the buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

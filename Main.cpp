@@ -2,17 +2,20 @@
  * The main entry point for the physical simulation client.
  */
 
+#include <GL/glut.h>
 #include "Engine.h"
 #include "Network/Controller.h"
 #include "ClientObjectTranslation.h"
+#include "MainMenuState.h"
 
 using namespace Network;
 
 int main(int argc, char** argv)
 {
-    ClientObjectTranslation translation;
-    Controller controller(ControllerMode::Client, translation, "127.0.0.1", 5055);
-    Engine engine(controller);
+    glutInit(&argc, argv);
+
+    Engine engine;
+    engine.Switch(new MainMenuState(&engine));
 
     while (engine.IsRunning())
     {

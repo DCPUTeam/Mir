@@ -2,7 +2,10 @@
  * The class definition for the network server.
  */
 
+#define MIR_NETWORK_CONTROLLER_INTERNALS
+
 #include "tcp_server.h"
+#include "../Controller.h"
 
 namespace Network
 {
@@ -12,6 +15,7 @@ namespace Network
             : m_Acceptor(io_service, tcp::endpoint(tcp::v4(), port)), m_Controller(controller)
         {
             this->start_accept();
+            this->m_Controller.SetConnectionStatus(false, true);
         }
         
         void tcp_server::broadcast(std::string data)

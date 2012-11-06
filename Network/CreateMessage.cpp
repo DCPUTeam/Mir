@@ -2,6 +2,8 @@
  * The class definitions for a message that creates objects.
  */
 
+#define MIR_NETWORK_CONTROLLER_INTERNALS
+
 #include <exception>
 #include "CreateMessage.h"
 

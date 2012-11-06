@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 2.8.5)
+
+if(MSVC)
+    set(freeglut_LIBRARY ${mir_SOURCE_DIR}/third-party/freeglut/lib/freeglut.lib PARENT_SCOPE)
+    set(freeglut_SOURCE_DIR ${mir_SOURCE_DIR}/third-party/freeglut/include PARENT_SCOPE)
+else()
+    find_package(GLUT REQUIRED)
+    set(freeglut_LIBRARY ${GLUT_LIBRARY} PARENT_SCOPE)
+    set(freeglut_SOURCE_DIR ${GLUT_INCLUDE_DIR} PARENT_SCOPE)
+endif()

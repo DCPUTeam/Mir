@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 2.8.5)
+
+if(MSVC)
+    set(glew_LIBRARY ${mir_SOURCE_DIR}/third-party/glew/lib/glew32.lib PARENT_SCOPE)
+    set(glew_SOURCE_DIR ${mir_SOURCE_DIR}/third-party/glew/include PARENT_SCOPE)
+else()
+    find_package(GLEW REQUIRED)
+    set(glew_LIBRARY ${GLEW_LIBRARY} PARENT_SCOPE)
+    set(glew_SOURCE_DIR ${GLEW_INCLUDE_DIR} PARENT_SCOPE)
+endif()

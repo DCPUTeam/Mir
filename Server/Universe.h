@@ -9,20 +9,20 @@
 #include "Actor.h"
 #include "Ship.h"
 #include "../Network/Controller.h"
-#include "../Network/IdentifiableObject.h"
+#include "../Network/SpatialObject.h"
 
 using namespace Network;
 
 namespace Server
 {
-    class Universe : public IdentifiableObject
+    class Universe : public Network::SpatialObject
     {
     private:
         std::list<Actor*> m_Actors;
         std::list<Ship*> m_Ships;
     public:
         Universe(Controller& controller, std::string identifier)
-            : IdentifiableObject(controller, identifier) { }
+            : Network::SpatialObject(controller, identifier) { }
         virtual void ReceiveMessage(Message& message);
     };
 }

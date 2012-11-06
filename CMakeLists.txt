@@ -3,6 +3,8 @@ project(mir)
 
 add_subdirectory(third-party/bullet)
 add_subdirectory(third-party/sqlite3)
+add_subdirectory(third-party/freeglut)
+add_subdirectory(third-party/glew)
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
@@ -14,6 +16,8 @@ link_directories(
 )
 include_directories(
     ${Boost_INCLUDE_DIRS}
+    ${freeglut_SOURCE_DIR}
+    ${glew_SOURCE_DIR}
     ${GLFW_SOURCE_DIR}/include
     ${png_SOURCE_DIR}
     ${z_SOURCE_DIR}
@@ -25,6 +29,8 @@ add_library(mir-network STATIC
     Network/Controller.cpp
     Network/IdentifiableObject.h
     Network/IdentifiableObject.cpp
+    Network/SpatialObject.h
+    Network/SpatialObject.cpp
     Network/Internal/tcp_server_connection.h
     Network/Internal/tcp_server_connection.cpp
     Network/Internal/tcp_server.h
@@ -38,13 +44,17 @@ add_library(mir-network STATIC
     Network/ObjectTranslation.h
     Network/PlayerJoinMessage.h
     Network/PlayerJoinMessage.cpp
+    Network/RequestMessage.h
+    Network/RequestMessage.cpp
+    Network/NotFoundMessage.h
+    Network/NotFoundMessage.cpp
+    Network/RepositionMessage.h
+    Network/RepositionMessage.cpp
 )
 add_executable(mir
     Main.cpp
     Engine.h
     Engine.cpp
-    RenderingEngine.h
-    RenderingEngine.cpp
     CachedUniverse.h
     CachedUniverse.cpp
     CachedActor.h
@@ -53,10 +63,15 @@ add_executable(mir
     CachedPlayer.cpp
     CachedShip.h
     CachedShip.cpp
-    CachedSpatial.h
-    CachedSpatial.cpp
     ClientObjectTranslation.h
     ClientObjectTranslation.cpp
+    BaseState.h
+    GameplayState.h
+    GameplayState.cpp
+    GameplayRenderingEngine.h
+    GameplayRenderingEngine.cpp
+    MainMenuState.h
+    MainMenuState.cpp
 )
 add_executable(mir-server
     Server/Main.cpp
@@ -68,8 +83,6 @@ add_executable(mir-server
     Server/Player.cpp
     Server/Ship.h
     Server/Ship.cpp
-    Server/Spatial.h
-    Server/Spatial.cpp
     Server/ServerObjectTranslation.h
     Server/ServerObjectTranslation.cpp
 )
@@ -81,6 +94,8 @@ target_link_libraries(mir
     png
     z
     glfw
+    ${freeglut_LIBRARY}
+    ${glew_LIBRARY}
     ${GLFW_LIBRARIES}
     ${OPENGL_LIBRARIES}
     ${Boost_LIBRARIES}

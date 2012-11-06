@@ -1,13 +1,17 @@
-/*
- * The class declaration for the client object translation.
- */
+///
+/// @brief The class declaration for the client object translation.
+/// @author James Rhodes
+///
 
-#ifndef __DCPU_GAME_CLIENT_OBJECT_TRANSLATION_H
-#define __DCPU_GAME_CLIENT_OBJECT_TRANSLATION_H
+#ifndef __MIR_CLIENT_OBJECT_TRANSLATION_H
+#define __MIR_CLIENT_OBJECT_TRANSLATION_H
 
 #include <string>
 #include "Network/ObjectTranslation.h"
 
+///
+/// @brief Provides functionality from translating network IDs into objects in memory and visa-versa.
+///
 class ClientObjectTranslation : public Network::ObjectTranslation
 {
 public:

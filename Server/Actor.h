@@ -5,16 +5,15 @@
 #ifndef __DCPU_GAME_SERVER_ACTOR_H
 #define __DCPU_GAME_SERVER_ACTOR_H
 
-#include "Spatial.h"
-#include "../Network/IdentifiableObject.h"
+#include "../Network/SpatialObject.h"
 
 namespace Server
 {
-    class Actor : public Spatial, public Network::IdentifiableObject
+    class Actor : public Network::SpatialObject
     {
     public:
         Actor(Network::Controller& controller, std::string identifier)
-            : Network::IdentifiableObject(controller, identifier) {}
+            : Network::SpatialObject(controller, identifier) {}
         virtual void ReceiveMessage(Network::Message& message);
     };
 }

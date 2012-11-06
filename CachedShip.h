@@ -1,18 +1,21 @@
-/*
- * The class declaration for Ships.
- */
+///
+/// @brief The class declaration for Ships.
+/// @author James Rhodes
+///
 
-#ifndef __DCPU_GAME_SHIP
-#define __DCPU_GAME_SHIP
+#ifndef __MIR_SHIP
+#define __MIR_SHIP
 
-#include "CachedSpatial.h"
-#include "Network/IdentifiableObject.h"
+#include "Network/SpatialObject.h"
 
-class CachedShip : public CachedSpatial, public Network::IdentifiableObject
+///
+/// @brief Represents a cached ship on the client side.
+///
+class CachedShip : public Network::SpatialObject
 {
 public:
     CachedShip(Network::Controller& controller, std::string identifier)
-        : Network::IdentifiableObject(controller, identifier) {}
+        : Network::SpatialObject(controller, identifier) {}
     virtual void ReceiveMessage(Network::Message& message);
 };
 

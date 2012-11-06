@@ -1,32 +1,44 @@
-/*
- * The class declaration for the Engine.
- */
+///
+/// @brief The class declaration for the Engine.
+/// @author James Rhodes
+///
 
-#ifndef __DCPU_GAME_ENGINE_H
-#define __DCPU_GAME_ENGINE_H
+#ifndef __MIR_ENGINE_H
+#define __MIR_ENGINE_H
+
+class Engine;
 
 #include <GL/glfw3.h>
 #include <boost/noncopyable.hpp>
-#include "CachedUniverse.h"
-#include "CachedPlayer.h"
 #include "Network/Controller.h"
+#include "ClientObjectTranslation.h"
+#include "BaseState.h"
 
+///
+/// @brief The main game engine.
+/// 
 class Engine : private boost::noncopyable
 {
 private:
-    CachedUniverse* m_Universe;
-    CachedPlayer* m_Player;
-    Network::Controller& m_Controller;
+    Network::Controller* m_Controller;
+    ClientObjectTranslation* m_Translation;
+    BaseState* m_CurrentState;
 
     GLFWwindow m_GLFWWindow;
     bool m_Running;
     bool m_WindowOpen;
 public:
-    Engine(Network::Controller& controller);
+    Engine();
     ~Engine();
     bool IsRunning();
     void Run();
     void Cleanup();
+    void Engine::Connect(std::string address, int port);
+    void Engine::Disconnect();
+    void Switch(BaseState* state);
+    GLFWwindow& GetWindow();
+    bool HasNetworkController();
+    Network::Controller& GetNetworkController();
 };
 
 #endif

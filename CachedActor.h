@@ -1,18 +1,21 @@
-/*
- * The class declaration for Actors.
- */
+///
+/// @brief The class declaration for Actors.
+/// @author James Rhodes
+///
 
-#ifndef __DCPU_GAME_ACTOR_H
-#define __DCPU_GAME_ACTOR_H
+#ifndef __MIR_ACTOR_H
+#define __MIR_ACTOR_H
 
-#include "CachedSpatial.h"
-#include "Network/IdentifiableObject.h"
+#include "Network/SpatialObject.h"
 
-class CachedActor : public CachedSpatial, public Network::IdentifiableObject
+///
+/// @brief Represents a cached actor on the client side.
+///
+class CachedActor : public Network::SpatialObject
 {
 public:
     CachedActor(Network::Controller& controller, std::string identifier)
-        : Network::IdentifiableObject(controller, identifier) {}
+        : Network::SpatialObject(controller, identifier) {}
     virtual void ReceiveMessage(Network::Message& message);
 };
 

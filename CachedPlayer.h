@@ -1,20 +1,24 @@
-/*
- * The class declaration for the Player.
- */
+///
+/// @brief The class declaration for the Player.
+/// @author James Rhodes
+///
 
-#ifndef __DCPU_GAME_PLAYER_H
-#define __DCPU_GAME_PLAYER_H
+#ifndef __MIR_PLAYER_H
+#define __MIR_PLAYER_H
 
-#include "CachedSpatial.h"
 #include "CachedActor.h"
+#include "Network/SpatialObject.h"
 
-class CachedPlayer : public CachedSpatial, public Network::IdentifiableObject
+///
+/// @brief Represents a cached player on the client side.
+///
+class CachedPlayer : public Network::SpatialObject
 {
 private:
     CachedActor* m_Actor;
 public:
     CachedPlayer(Network::Controller& controller, std::string identifier)
-        : Network::IdentifiableObject(controller, identifier), m_Actor(NULL) {}
+        : Network::SpatialObject(controller, identifier), m_Actor(NULL) {}
     virtual void ReceiveMessage(Network::Message& message);
 };
 

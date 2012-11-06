@@ -30,6 +30,7 @@ namespace Network
     public:
         std::string GetIdentifier();
         virtual void ReceiveMessage(Message& message) = 0;
+        virtual void Resynchronise();
     };
 }
 

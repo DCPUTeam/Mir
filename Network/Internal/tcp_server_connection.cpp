@@ -25,14 +25,14 @@ namespace Network
         ///
         void tcp_server_connection::broadcast(std::string data)
         {
-            std::cout << "Pushing new message onto deque for sending to client." << std::endl;
+            //std::cout << "Pushing new message onto deque for sending to client." << std::endl;
 
             bool write_in_progress = !this->m_DataMessages.empty();
 
             // Create header information.
             if (data.length() > UINT16_MAX)
             {
-                std::cerr << "ERROR: Packet is larger than UINT16_MAX and can not be sent." << std::endl;
+                //std::cerr << "ERROR: Packet is larger than UINT16_MAX and can not be sent." << std::endl;
                 return;
             }
             uint16_t l = data.length();
@@ -56,7 +56,7 @@ namespace Network
         ///
         void tcp_server_connection::read_header()
         {
-            std::cout << "Attempting to read " << sizeof(this->m_PacketLength) << " bytes from remote client." << std::endl;
+            //std::cout << "Attempting to read " << sizeof(this->m_PacketLength) << " bytes from remote client." << std::endl;
 
             boost::asio::async_read(this->m_Socket,
                                     boost::asio::buffer(&this->m_PacketLength, sizeof(this->m_PacketLength)),
@@ -69,7 +69,7 @@ namespace Network
         ///
         void tcp_server_connection::read_message()
         {
-            std::cout << "Attempting to read " << this->m_PacketLength << " bytes from remote client." << std::endl;
+            //std::cout << "Attempting to read " << this->m_PacketLength << " bytes from remote client." << std::endl;
 
             boost::asio::async_read(this->m_Socket,
                                     boost::asio::buffer(this->m_PacketData, this->m_PacketLength),
@@ -82,7 +82,7 @@ namespace Network
         ///
         void tcp_server_connection::start()
         {
-            std::cout << "Obtained connection from remote client." << std::endl;
+            //std::cout << "Obtained connection from remote client." << std::endl;
 
             // Read the next header.
             this->read_header();
@@ -95,15 +95,15 @@ namespace Network
         {
             if (error)
             {
-                std::cerr << "Error while reading message data from remote client." << std::endl;
-                std::cerr << error.message() << std::endl;
+                //std::cerr << "Error while reading message data from remote client." << std::endl;
+                //std::cerr << error.message() << std::endl;
 
                 // Disconnect the user by not setting up any further
                 // asynchronous operations.
                 return;
             }
 
-            std::cout << "Read header from remote client (" << this->m_PacketLength << " bytes to read)." << std::endl;
+            //std::cout << "Read header from remote client (" << this->m_PacketLength << " bytes to read)." << std::endl;
 
             // Construct an appropriate data block to hold the data.
             this->m_PacketData = new char[this->m_PacketLength];
@@ -119,14 +119,14 @@ namespace Network
         {
             if (error)
             {
-                std::cerr << "Error while reading message data from remote client." << std::endl;
+                //std::cerr << "Error while reading message data from remote client." << std::endl;
 
                 // Disconnect the user by not setting up any further
                 // asynchronous operations.
                 return;
             }
 
-            std::cout << "Read " << this->m_PacketLength << " bytes from remote client." << std::endl;
+            //std::cout << "Read " << this->m_PacketLength << " bytes from remote client." << std::endl;
 
             // Make a copy of the length and data pointer (the data isn't freed;
             // that's the controller's responsibility).
@@ -153,7 +153,7 @@ namespace Network
         void tcp_server_connection::handle_write(const boost::system::error_code& error,
                                           size_t bytes_transferred)
         {
-            std::cout << "Sent " << bytes_transferred << " bytes to remote client." << std::endl;
+            //std::cout << "Sent " << bytes_transferred << " bytes to remote client." << std::endl;
 
             if (!error)
             {

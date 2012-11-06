@@ -31,4 +31,10 @@ namespace Network
     {
         this->m_Controller.SendMessage(*this, message);
     }
+
+    void IdentifiableObject::Resynchronise()
+    {
+        // By default we resynchronise nothing since we don't
+        // know the structure of the class...
+    }
 }

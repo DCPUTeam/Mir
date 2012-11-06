@@ -3,27 +3,85 @@
  */
 
 #include <cassert>
+#include <GL/glew.h>
 #include <GL/glfw3.h>
 #include "Engine.h"
-#include "RenderingEngine.h"
+#include "Network/Controller.h"
 #include "Network/PlayerJoinMessage.h"
 
-Engine::Engine(Network::Controller& controller)
-    : m_Controller(controller)
+Engine::Engine()
+    : m_Controller(NULL), m_CurrentState(NULL)
 {
     this->m_Running = true;
     this->m_WindowOpen = false;
-    this->m_Universe = NULL; //(CachedUniverse*)this->m_Controller.Find("universe");
-    this->m_Player = NULL; //(CachedPlayer*)this->m_Controller.Find("player");
-    //assert(this->m_Universe != NULL);
-    //assert(this->m_Player != NULL);
+    this->m_Translation = new ClientObjectTranslation();
 
+    // Initailize GLFW.
     glfwInit();
+
+    // Open an 800x600 that matches the parameters as closely as possible.
+    this->m_GLFWWindow = glfwCreateWindow(800, 600, GLFW_WINDOWED, "Mir", 0);
+    this->m_WindowOpen = true;
+    glfwMakeContextCurrent(this->m_GLFWWindow);
+
+    // Initialize GLEW.
+    std::cout << "Minimum Required: OpenGL 1.4" << std::endl;
+    GLenum err = glewInit();
+    if (err != GLEW_OK)
+    {
+        std::cout << "Result: FAIL!" << std::endl;
+        std::cerr << "Unable to load GLEW to inspect OpenGL support." << std::endl;
+        std::cerr << "Ensure the GLEW libraries are installed and available for use." << std::endl;
+        exit(1);
+    }
+    else
+    {
+        // Display OpenGL support status.
+        std::cout << "OpenGL 1.1: " << (GLEW_VERSION_1_1 ? "Available" : "MISSING") << std::endl;
+        std::cout << "OpenGL 1.2: " << (GLEW_VERSION_1_2 ? "Available" : "MISSING") << std::endl;
+        std::cout << "OpenGL 1.3: " << (GLEW_VERSION_1_3 ? "Available" : "MISSING") << std::endl;
+        std::cout << "OpenGL 1.4: " << (GLEW_VERSION_1_4 ? "Available" : "MISSING") << std::endl;
+        std::cout << "OpenGL 1.5: " << (GLEW_VERSION_1_5 ? "Available" : "MISSING") << std::endl;
+        std::cout << "OpenGL 2.0: " << (GLEW_VERSION_2_0 ? "Available" : "MISSING") << std::endl;
+        std::cout << "OpenGL 2.1: " << (GLEW_VERSION_2_1 ? "Available" : "MISSING") << std::endl;
+        std::cout << "OpenGL 3.0: " << (GLEW_VERSION_3_0 ? "Available" : "MISSING") << std::endl;
+        std::cout << "OpenGL 3.1: " << (GLEW_VERSION_3_1 ? "Available" : "MISSING") << std::endl;
+        std::cout << "OpenGL 3.2: " << (GLEW_VERSION_3_2 ? "Available" : "MISSING") << std::endl;
+        std::cout << "OpenGL 3.3: " << (GLEW_VERSION_3_3 ? "Available" : "MISSING") << std::endl;
+        std::cout << "OpenGL 4.0: " << (GLEW_VERSION_4_0 ? "Available" : "MISSING") << std::endl;
+        std::cout << "OpenGL 4.1: " << (GLEW_VERSION_4_1 ? "Available" : "MISSING") << std::endl;
+        std::cout << "OpenGL 4.2: " << (GLEW_VERSION_4_2 ? "Available" : "MISSING") << std::endl;
+        std::cout << "OpenGL 4.3: " << (GLEW_VERSION_4_3 ? "Available" : "MISSING") << std::endl;
+        if (GLEW_VERSION_1_4)
+            std::cout << "Result: OK!" << std::endl;
+        else
+        {
+            std::cout << "Result: FAIL!" << std::endl;
+            std::cerr << "Upgrade your OpenGL drivers." << std::endl;
+            exit(1);
+        }
+    }
 }
 
 Engine::~Engine()
 {
+    this->m_CurrentState->Deactivate();
+    delete this->m_Translation;
+    delete this->m_CurrentState;
     glfwTerminate();
+}
+
+void Engine::Connect(std::string address, int port)
+{
+    if (this->m_Controller != NULL)
+        this->m_Controller->Close();
+    this->m_Controller = new Network::Controller(Network::ControllerMode::Client, *this->m_Translation, address, port);
+}
+
+void Engine::Disconnect()
+{
+    this->m_Controller->Close();
+    this->m_Controller = NULL;
 }
 
 bool Engine::IsRunning()
@@ -44,29 +102,12 @@ void Engine::Run()
 
     // Render the game.
     glfwPollEvents();
-    if (this->m_Player != NULL && this->m_Universe != NULL)
-        RenderingEngine::Render(*this->m_Player, *this->m_Universe);
+    if (this->m_CurrentState != NULL)
+    {
+        this->m_CurrentState->Update();
+        this->m_CurrentState->Render();
+    }
     glfwSwapBuffers(this->m_GLFWWindow);
-
-    // Handle player movement.
-    if (this->m_Player != NULL)
-    {
-        if (glfwGetKey(this->m_GLFWWindow, GLFW_KEY_UP))
-            this->m_Player->Z += 1;
-        if (glfwGetKey(this->m_GLFWWindow, GLFW_KEY_DOWN))
-            this->m_Player->Z -= 1;
-        if (glfwGetKey(this->m_GLFWWindow, GLFW_KEY_LEFT))
-            this->m_Player->X += 1;
-        if (glfwGetKey(this->m_GLFWWindow, GLFW_KEY_RIGHT))
-            this->m_Player->X -= 1;
-    }
-
-    // Test player join.
-    if (glfwGetKey(this->m_GLFWWindow, GLFW_KEY_SPACE))
-    {
-        Network::PlayerJoinMessage message;
-        this->m_Controller.SendMessage(message);
-    }
 
     // If the user has pressed the escape key, close the program.
     // In future, this close handler will be much more advanced!
@@ -78,10 +119,42 @@ void Engine::Run()
     }
 
     // Synchronise the network.
-    this->m_Controller.Synchronise();
+    if (this->m_Controller != NULL)
+        this->m_Controller->Synchronise();
+}
+
+GLFWwindow& Engine::GetWindow()
+{
+    // Return the currently open window.
+    return this->m_GLFWWindow;
+}
+
+bool Engine::HasNetworkController()
+{
+    // Return whether we are connected to a network.
+    return this->m_Controller != NULL;
+}
+
+Network::Controller& Engine::GetNetworkController()
+{
+    // Return the current network controller.
+    assert(this->HasNetworkController());
+    return *this->m_Controller;
 }
 
 void Engine::Cleanup()
 {
     glfwDestroyWindow(this->m_GLFWWindow);
+}
+
+void Engine::Switch(BaseState* state)
+{
+    assert(state != NULL);
+    if (this->m_CurrentState != NULL)
+    {
+        this->m_CurrentState->Deactivate();
+        delete this->m_CurrentState;
+    }
+    this->m_CurrentState = state;
+    this->m_CurrentState->Activate();
 }

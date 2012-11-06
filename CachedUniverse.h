@@ -1,9 +1,10 @@
-/*
- * The class declaration for a Universe.
- */
+///
+/// @brief The class declaration for a Universe.
+/// @author James Rhodes
+///
 
-#ifndef __DCPU_GAME_UNIVERSE_H
-#define __DCPU_GAME_UNIVERSE_H
+#ifndef __MIR_UNIVERSE_H
+#define __MIR_UNIVERSE_H
 
 #include <list>
 #include "CachedActor.h"
@@ -11,6 +12,9 @@
 #include "Network/Controller.h"
 #include "Network/IdentifiableObject.h"
 
+///
+/// @brief Represents a cached universe on the client side.
+///
 class CachedUniverse : public Network::IdentifiableObject
 {
 private:
