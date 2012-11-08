@@ -20,6 +20,7 @@ namespace Network
 #include <boost/array.hpp>
 #include <boost/asio.hpp>
 #include "tcp_server_connection.h"
+#include "../Source.h"
 
 using boost::asio::ip::tcp;
 
@@ -31,7 +32,7 @@ namespace Network
         {
         public:
             tcp_server(Controller& controller, boost::asio::io_service& io_service, int port);
-            void broadcast(std::string data);
+            void broadcast(Source* except, std::string data);
         private:
             void start_accept();
             void handle_accept(tcp_server_connection::pointer new_connection,

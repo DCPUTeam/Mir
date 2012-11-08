@@ -14,7 +14,8 @@ namespace Network
     /// @brief Empty constructor used for deserialization.
     /// @internal
     ///
-    RequestMessage::RequestMessage()
+    RequestMessage::RequestMessage(Source* source)
+        : ObjectMessage(source)
     {
     }
 
@@ -22,6 +23,7 @@ namespace Network
     /// @brief Constructs a request for the object with the given identifier.
     ///
     RequestMessage::RequestMessage(std::string identifier)
+        : ObjectMessage(true)
     {
         this->Identifier = identifier;
     }
@@ -42,5 +44,15 @@ namespace Network
     void RequestMessage::Deserialize(std::string data)
     {
         this->Identifier = data;
+    }
+
+    int RequestMessage::GetHashCode()
+    {
+        int i = 0;
+        for (size_t j = 0; j < std::string("RequestMessage").length(); j++)
+            i += i * "RequestMessage"[i];
+        for (size_t j = 0; j < this->Identifier.length(); j++)
+            i += i * this->Identifier[i];
+        return i;
     }
 }

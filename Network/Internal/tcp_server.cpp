@@ -18,11 +18,13 @@ namespace Network
             this->m_Controller.SetConnectionStatus(false, true);
         }
         
-        void tcp_server::broadcast(std::string data)
+        void tcp_server::broadcast(Source* except, std::string data)
         {
             for (std::list<tcp_server_connection::pointer>::const_iterator i = this->m_Clients.begin();
                 i != this->m_Clients.end(); i++)
             {
+                if (except != NULL && *i == except->Client)
+                    continue;
                 (*i)->broadcast(data);
             }
         }

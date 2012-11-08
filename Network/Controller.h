@@ -21,6 +21,7 @@ namespace Network
 #include "Internal/tcp_client.h"
 #include "ObjectTranslation.h"
 #include "Message.h"
+#include "Source.h"
 
 namespace Network
 {
@@ -95,7 +96,7 @@ namespace Network
         ~Controller();
         void SendMessage(Message& message);
         void SendMessage(IdentifiableObject& object, Message& message);
-        void ReceiveData(size_t length, char* data);
+        void ReceiveData(Source* source, size_t length, char* data);
         void ReceiveMessage(Message& message);
         void Synchronise();
         void Register(IdentifiableObject& object);

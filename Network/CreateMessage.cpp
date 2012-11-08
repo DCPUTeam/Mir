@@ -9,11 +9,13 @@
 
 namespace Network
 {
-    CreateMessage::CreateMessage()
+    CreateMessage::CreateMessage(Source* source)
+        : ObjectMessage(source)
     {
     }
 
     CreateMessage::CreateMessage(std::string type, std::string identifier)
+        : ObjectMessage(true)
     {
         this->Type = type;
         this->Identifier = identifier;
@@ -31,5 +33,17 @@ namespace Network
             throw std::exception();
         this->Type = data.substr(0, at);
         this->Identifier = data.substr(at + 1, data.length() - at - 1);
+    }
+
+    int CreateMessage::GetHashCode()
+    {
+        int i = 0;
+        for (size_t j = 0; j < std::string("CreateMessage").length(); j++)
+            i += i * "CreateMessage"[i];
+        for (size_t j = 0; j < this->Type.length(); j++)
+            i += i * this->Type[i];
+        for (size_t j = 0; j < this->Identifier.length(); j++)
+            i += i * this->Identifier[i];
+        return i;
     }
 }

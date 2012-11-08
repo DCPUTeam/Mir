@@ -18,7 +18,8 @@ namespace Network
     /// @brief Empty constructor used for deserialization.
     /// @internal
     ///
-    RepositionMessage::RepositionMessage()
+    RepositionMessage::RepositionMessage(Source* source)
+        : ObjectMessage(source)
     {
     }
 
@@ -26,6 +27,7 @@ namespace Network
     /// @brief Constructs a repositioning message for the object with the given identifier.
     ///
     RepositionMessage::RepositionMessage(std::string identifier, bool xchanged, double x, bool ychanged, double y, bool zchanged, double z)
+        : ObjectMessage(false)
     {
         this->Identifier = identifier;
         this->XChanged = xchanged;
@@ -82,5 +84,15 @@ namespace Network
             this->Y = 0;
         if (!(std::stringstream(*(i++)) >> this->Z))
             this->Z = 0;
+    }
+
+    int RepositionMessage::GetHashCode()
+    {
+        int i = 0;
+        for (size_t j = 0; j < std::string("RepositionMessage").length(); j++)
+            i += i * "RepositionMessage"[i];
+        for (size_t j = 0; j < this->Identifier.length(); j++)
+            i += i * this->Identifier[i];
+        return i;
     }
 }

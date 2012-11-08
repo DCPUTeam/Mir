@@ -6,22 +6,22 @@
 #define __DCPU_GAME_NETWORKING_CREATE_MESSAGE_H
 
 #include <string>
-#include "Message.h"
+#include "ObjectMessage.h"
 
 namespace Network
 {
-    class CreateMessage : public Message
+    class CreateMessage : public ObjectMessage
     {
     public:
 #ifdef MIR_NETWORK_CONTROLLER_INTERNALS
-        CreateMessage();
+        CreateMessage(Source* source);
 #endif
         CreateMessage(std::string type, std::string identifier);
         virtual std::string Serialize();
         virtual void Deserialize(std::string data);
+        virtual int GetHashCode();
 
         std::string Type;
-        std::string Identifier;
     };
 }
 

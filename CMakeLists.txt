@@ -50,6 +50,10 @@ add_library(mir-network STATIC
     Network/NotFoundMessage.cpp
     Network/RepositionMessage.h
     Network/RepositionMessage.cpp
+    Network/ObjectMessage.h
+    Network/ObjectMessage.cpp
+    Network/Source.h
+    Network/Source.cpp
 )
 add_executable(mir
     Main.cpp

@@ -13,9 +13,13 @@ namespace Network
     class PlayerJoinMessage : public Message
     {
     public:
+#ifdef MIR_NETWORK_CONTROLLER_INTERNALS
+        PlayerJoinMessage(Source* source);
+#endif
         PlayerJoinMessage();
         virtual std::string Serialize();
         virtual void Deserialize(std::string data);
+        virtual int GetHashCode();
     };
 }
 

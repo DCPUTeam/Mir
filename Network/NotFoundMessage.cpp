@@ -14,7 +14,8 @@ namespace Network
     /// @brief Empty constructor used for deserialization.
     /// @internal
     ///
-    NotFoundMessage::NotFoundMessage()
+    NotFoundMessage::NotFoundMessage(Source* source)
+        : ObjectMessage(source)
     {
     }
 
@@ -22,6 +23,7 @@ namespace Network
     /// @brief Constructs a response that the object with the given identifier doesn't exist.
     ///
     NotFoundMessage::NotFoundMessage(std::string identifier)
+        : ObjectMessage(true)
     {
         this->Identifier = identifier;
     }
@@ -42,5 +44,15 @@ namespace Network
     void NotFoundMessage::Deserialize(std::string data)
     {
         this->Identifier = data;
+    }
+
+    int NotFoundMessage::GetHashCode()
+    {
+        int i = 0;
+        for (size_t j = 0; j < std::string("NotFoundMessage").length(); j++)
+            i += i * "NotFoundMessage"[i];
+        for (size_t j = 0; j < this->Identifier.length(); j++)
+            i += i * this->Identifier[i];
+        return i;
     }
 }

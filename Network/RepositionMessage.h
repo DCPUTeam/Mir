@@ -7,7 +7,7 @@
 #define __MIR_NETWORKING_REPOSITION_MESSAGE_H
 
 #include <string>
-#include "Message.h"
+#include "ObjectMessage.h"
 
 namespace Network
 {
@@ -15,17 +15,17 @@ namespace Network
     /// @brief A message that requests a spatial entity either be positioned, or the current
     ///        position of a spatial entity (depending on who recieves it).
     ///
-    class RepositionMessage : public Message
+    class RepositionMessage : public ObjectMessage
     {
     public:
 #ifdef MIR_NETWORK_CONTROLLER_INTERNALS
-        RepositionMessage();
+        RepositionMessage(Source* source);
 #endif
         RepositionMessage(std::string identifier, bool xchanged, double x, bool ychanged, double y, bool zchanged, double z);
         virtual std::string Serialize();
         virtual void Deserialize(std::string data);
+        virtual int GetHashCode();
 
-        std::string Identifier;
         bool XChanged;
         bool YChanged;
         bool ZChanged;

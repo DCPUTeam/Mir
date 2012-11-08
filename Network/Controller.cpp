@@ -83,7 +83,7 @@ namespace Network
         if (this->m_Mode == ControllerMode::Server)
         {
             // Broadcast message to all connected clients.
-            this->m_TCPServer->broadcast(serialized);
+            this->m_TCPServer->broadcast(message.GetSource(), serialized);
         }
         else if (this->m_Mode == ControllerMode::Client)
         {
@@ -92,7 +92,7 @@ namespace Network
         }
     }
 
-    void Controller::ReceiveData(size_t length, char* data)
+    void Controller::ReceiveData(Source* source, size_t length, char* data)
     {
         // Convert the raw data into an std::string.
         std::string message(data, length);
@@ -127,7 +127,7 @@ namespace Network
             // is currently unused, but we need to create the new
             // object, depending on it's type.  First however, we need
             // to create a new CreateMessage and deserialize.
-            CreateMessage create;
+            CreateMessage create(source);
             create.Deserialize(message);
 
             // Create the new object.  The object is automatically registered
@@ -141,7 +141,7 @@ namespace Network
                 return;
 
             // Deserialize request message.
-            RequestMessage request;
+            RequestMessage request(source);
             request.Deserialize(message);
             this->ReceiveMessage(request);
         }
@@ -152,7 +152,7 @@ namespace Network
                 return;
 
             // Deserialize the not found message.
-            NotFoundMessage notfound;
+            NotFoundMessage notfound(source);
             notfound.Deserialize(message);
             this->ReceiveMessage(notfound);
         }
@@ -163,14 +163,14 @@ namespace Network
                 return;
 
             // Deserialize player join message.
-            PlayerJoinMessage player_join;
+            PlayerJoinMessage player_join(source);
             player_join.Deserialize(message);
             this->ReceiveMessage(player_join);
         }
         else if (message_type == typeid(RepositionMessage).name())
         {
             // Deserialize reposition messsage.
-            RepositionMessage repos;
+            RepositionMessage repos(source);
             repos.Deserialize(message);
             this->ReceiveMessage(repos);
         }
@@ -192,9 +192,10 @@ namespace Network
                     // We have found the matching object.  Send back a
                     // CreateMessage that informs the client that the
                     // object does exist.
-                    CreateMessage create;
-                    create.Identifier = i->first;
-                    create.Type = this->m_ObjectTranslation.GetType(i->second);
+                    CreateMessage create(
+                        this->m_ObjectTranslation.GetType(i->second),
+                        i->first
+                        );
                     this->SendMessage(create);
                     return;
                 }
@@ -202,8 +203,9 @@ namespace Network
 
             // The specified object does not exist.  Tell the client
             // that the object isn't in existance.
-            NotFoundMessage notfound;
-            notfound.Identifier = ((RequestMessage&)message).Identifier;
+            NotFoundMessage notfound(
+                ((RequestMessage&)message).Identifier
+                );
             this->SendMessage(notfound);
         }
         else if (typeid(message) == typeid(NotFoundMessage))
@@ -295,8 +297,7 @@ namespace Network
                 if (i->second->Status == REQUEST_STATUS_PENDING)
                 {
                     // Send out a request for this object.
-                    RequestMessage request;
-                    request.Identifier = i->first;
+                    RequestMessage request(i->first);
                     this->SendMessage(request);
                     i->second->Status = REQUEST_STATUS_SENT;
                 }

@@ -190,7 +190,7 @@ namespace Network
             this->read_header();
 
             // Tell the controller that we have received a message.
-            this->m_Controller.ReceiveData(length,  data);
+            this->m_Controller.ReceiveData(NULL, length,  data);
         }
     }
 }
