@@ -1,15 +1,21 @@
 cmake_minimum_required(VERSION 2.8.5)
 project(mir)
 
+option(SERVER_ONLY "Only build the server (non-graphical) components." OFF)
+
 add_subdirectory(third-party/bullet)
 add_subdirectory(third-party/sqlite3)
-add_subdirectory(third-party/freeglut)
-add_subdirectory(third-party/glew)
+if(NOT ${SERVER_ONLY})
+    add_subdirectory(third-party/freeglut)
+    add_subdirectory(third-party/glew)
+endif()
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(OpenGL REQUIRED)
+if(NOT ${SERVER_ONLY})
+    find_package(OpenGL REQUIRED)
+endif()
 find_package(Boost COMPONENTS system REQUIRED)
 link_directories(
     ${Boost_LIBRARY_DIRS}
@@ -55,28 +61,30 @@ add_library(mir-network STATIC
     Network/Source.h
     Network/Source.cpp
 )
-add_executable(mir
-    Main.cpp
-    Engine.h
-    Engine.cpp
-    CachedUniverse.h
-    CachedUniverse.cpp
-    CachedActor.h
-    CachedActor.cpp
-    CachedPlayer.h
-    CachedPlayer.cpp
-    CachedShip.h
-    CachedShip.cpp
-    ClientObjectTranslation.h
-    ClientObjectTranslation.cpp
-    BaseState.h
-    GameplayState.h
-    GameplayState.cpp
-    GameplayRenderingEngine.h
-    GameplayRenderingEngine.cpp
-    MainMenuState.h
-    MainMenuState.cpp
-)
+if(NOT ${SERVER_ONLY})
+    add_executable(mir
+        Main.cpp
+        Engine.h
+        Engine.cpp
+        CachedUniverse.h
+        CachedUniverse.cpp
+        CachedActor.h
+        CachedActor.cpp
+        CachedPlayer.h
+        CachedPlayer.cpp
+        CachedShip.h
+        CachedShip.cpp
+        ClientObjectTranslation.h
+        ClientObjectTranslation.cpp
+        BaseState.h
+        GameplayState.h
+        GameplayState.cpp
+        GameplayRenderingEngine.h
+        GameplayRenderingEngine.cpp
+        MainMenuState.h
+        MainMenuState.cpp
+    )
+endif()
 add_executable(mir-server
     Server/Main.cpp
     Server/Universe.h
@@ -93,24 +101,31 @@ add_executable(mir-server
 target_link_libraries(mir-network
     ${Boost_LIBRARIES}
 )
-target_link_libraries(mir
-    mir-network
-    png
-    z
-    glfw
-    ${freeglut_LIBRARY}
-    ${glew_LIBRARY}
-    ${GLFW_LIBRARIES}
-    ${OPENGL_LIBRARIES}
-    ${Boost_LIBRARIES}
-)
+if(NOT ${SERVER_ONLY})
+    target_link_libraries(mir
+        mir-network
+        png
+        z
+        glfw
+        ${freeglut_LIBRARY}
+        ${glew_LIBRARY}
+        ${GLFW_LIBRARIES}
+        ${OPENGL_LIBRARIES}
+        ${Boost_LIBRARIES}
+    )
+endif()
 target_link_libraries(mir-server
     mir-network
     ${Boost_LIBRARIES}
 )
 if(MSVC)
     add_definitions(-D_WIN32_WINNT=0x0501)
+else()
+    target_link_libraries(mir-server
+        pthread)
 endif()
 cotire(mir-network)
-cotire(mir)
+if(NOT ${SERVER_ONLY})
+    cotire(mir)
+endif()
 cotire(mir-server)

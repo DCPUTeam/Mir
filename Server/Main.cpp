@@ -13,10 +13,10 @@ using namespace Network;
 int main(int argc, char** argv)
 {
     ServerObjectTranslation translation;
-    Controller controller(ControllerMode::Server, translation, "127.0.0.1", 5055);
+    Controller controller(ControllerMode::Server, translation, "", 5055);
 
     // Show welcome message.
-    std::cout << "Mir Game Server (listening on localhost:5055)" << std::endl;
+    std::cout << "Mir Game Server (listening on *:5055)" << std::endl;
     std::cout << "===============================================" << std::endl;
 
     // Create universe and player.

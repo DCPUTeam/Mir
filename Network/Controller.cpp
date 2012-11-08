@@ -76,8 +76,20 @@ namespace Network
     {
         std::string data = message.Serialize();
 
+        std::string name;
+        if (typeid(message) == typeid(CreateMessage))
+            name = "class Network::CreateMessage";
+        else if (typeid(message) == typeid(NotFoundMessage))
+            name = "class Network::NotFoundMessage";
+        else if (typeid(message) == typeid(RepositionMessage))
+            name = "class Network::RepositionMessage";
+        else if (typeid(message) == typeid(RequestMessage))
+            name = "class Network::RequestMessage";
+        else if (typeid(message) == typeid(PlayerJoinMessage))
+            name = "class Network::PlayerJoinMessage";
+
         // Construct serialized representation.
-        std::string serialized = std::string(typeid(message).name()) + "\1" + id + "\1" + data;
+        std::string serialized = std::string(name) + "\1" + id + "\1" + data;
 
         // Send message to proper target(s).
         if (this->m_Mode == ControllerMode::Server)
@@ -117,7 +129,7 @@ namespace Network
 
         // The rest of the message is the message data.  Reconstruct
         // based on the type.
-        if (message_type == typeid(CreateMessage).name())
+        if (message_type == "class Network::CreateMessage")
         {
             // Check whether it's valid for this mode.
             if (this->m_Mode != ControllerMode::Client)
@@ -134,7 +146,7 @@ namespace Network
             // by it's constructor.
             this->m_ObjectTranslation.CreateByType(*this, create.Type, create.Identifier);
         }
-        else if (message_type == typeid(RequestMessage).name())
+        else if (message_type == "class Network::RequestMessage")
         {
             // Check whether it's valid for this mode.
             if (this->m_Mode != ControllerMode::Server)
@@ -145,7 +157,7 @@ namespace Network
             request.Deserialize(message);
             this->ReceiveMessage(request);
         }
-        else if (message_type == typeid(NotFoundMessage).name())
+        else if (message_type == "class Network::NotFoundMessage")
         {
             // Check whether it's valid for this mode.
             if (this->m_Mode != ControllerMode::Client)
@@ -156,7 +168,7 @@ namespace Network
             notfound.Deserialize(message);
             this->ReceiveMessage(notfound);
         }
-        else if (message_type == typeid(PlayerJoinMessage).name())
+        else if (message_type == "class Network::PlayerJoinMessage")
         {
             // Check whether it's valid for this mode.
             if (this->m_Mode != ControllerMode::Server)
@@ -167,7 +179,7 @@ namespace Network
             player_join.Deserialize(message);
             this->ReceiveMessage(player_join);
         }
-        else if (message_type == typeid(RepositionMessage).name())
+        else if (message_type == "class Network::RepositionMessage")
         {
             // Deserialize reposition messsage.
             RepositionMessage repos(source);
@@ -266,6 +278,7 @@ namespace Network
         else
         {
             //std::cout << "Client received a message of type " << typeid(message).name() << "!" << std::endl;
+            std::cout << "Unknown message recieved!" << std::endl;
         }
         
         //std::cerr << "FIXME Controller::ReceiveMessage!" << std::endl;
