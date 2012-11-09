@@ -2,6 +2,9 @@
  * The class definition for the network server connection.
  */
 
+#ifndef WIN32
+#define UINT16_MAX 65536
+#endif
 #include "tcp_server_connection.h"
 #include "../Controller.h"
 #include "../Message.h"

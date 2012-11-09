@@ -4,6 +4,9 @@
 
 #define MIR_NETWORK_CONTROLLER_INTERNALS
 
+#ifndef WIN32
+#define UINT16_MAX 65536
+#endif
 #include <stdint.h>
 #include "tcp_client.h"
 #include "../Controller.h"

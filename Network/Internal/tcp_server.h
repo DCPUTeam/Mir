@@ -15,6 +15,7 @@ namespace Network
     }
 }
 
+#include <list>
 #include <string>
 #include <iostream>
 #include <boost/array.hpp>
