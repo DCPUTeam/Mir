@@ -9,3 +9,11 @@ void CachedActor::ReceiveMessage(Network::Message& message)
     // Handle messages.
     std::cout << "NOTE: CachedActor just received a message!" << std::endl;
 }
+
+void CachedActor::Update()
+{
+}
+
+void CachedActor::Render()
+{
+}

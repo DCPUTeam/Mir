@@ -10,7 +10,7 @@
 #include "GameplayState.h"
 #include "GameplayRenderingEngine.h"
 #include "MainMenuState.h"
-#include "Network/PlayerJoinMessage.h"
+#include "Network/Messages/PlayerJoinMessage.h"
 
 CachedPlayer* GameplayState::GetPlayer()
 {
@@ -63,10 +63,15 @@ void GameplayState::Activate()
     // point saving the result of these calls.
     this->GetPlayer();
     this->GetUniverse();
+
+    // Start the gameplay rendering engine settings.
+    GameplayRenderingEngine::Init();
 }
 
 void GameplayState::Deactivate()
 {
+    // Stop the gameplay rendering engine settings.
+    GameplayRenderingEngine::Deinit();
 }
 
 void GameplayState::Update()
@@ -75,17 +80,48 @@ void GameplayState::Update()
     if (!this->ValidateConnection())
         return;
 
+    // Update the universe and everything in it.
+    if (this->GetUniverse() != NULL && this->GetPlayer() != NULL)
+    {
+        this->GetUniverse()->Update();
+        this->GetPlayer()->Update();
+    }
+
     // Handle player movement.
     if (this->GetPlayer() != NULL)
     {
         if (glfwGetKey(this->m_Engine->GetWindow(), GLFW_KEY_UP))
-            this->GetPlayer()->Z += 1;
+            this->GetPlayer()->Z += 0.1;
         if (glfwGetKey(this->m_Engine->GetWindow(), GLFW_KEY_DOWN))
-            this->GetPlayer()->Z -= 1;
+            this->GetPlayer()->Z -= 0.1;
         if (glfwGetKey(this->m_Engine->GetWindow(), GLFW_KEY_LEFT))
-            this->GetPlayer()->X += 1;
+            this->GetPlayer()->X += 0.1;
         if (glfwGetKey(this->m_Engine->GetWindow(), GLFW_KEY_RIGHT))
-            this->GetPlayer()->X -= 1;
+            this->GetPlayer()->X -= 0.1;
+        if (glfwGetKey(this->m_Engine->GetWindow(), GLFW_KEY_PAGE_UP))
+            this->GetPlayer()->Y += 0.1;
+        if (glfwGetKey(this->m_Engine->GetWindow(), GLFW_KEY_PAGE_DOWN))
+            this->GetPlayer()->Y -= 0.1;
+        if (glfwGetKey(this->m_Engine->GetWindow(), GLFW_KEY_Z))
+            this->GetPlayer()->CameraRotation += 0.1;
+        if (glfwGetKey(this->m_Engine->GetWindow(), GLFW_KEY_X))
+            this->GetPlayer()->CameraRotation -= 0.1;
+        /*if (glfwGetKey(this->m_Engine->GetWindow(), GLFW_KEY_Q))
+            this->GetPlayer()->FrustrumA += 0.1;
+        if (glfwGetKey(this->m_Engine->GetWindow(), GLFW_KEY_W))
+            this->GetPlayer()->FrustrumA -= 0.1;
+        if (glfwGetKey(this->m_Engine->GetWindow(), GLFW_KEY_E))
+            this->GetPlayer()->FrustrumB += 0.1;
+        if (glfwGetKey(this->m_Engine->GetWindow(), GLFW_KEY_R))
+            this->GetPlayer()->FrustrumB -= 0.1;
+        if (glfwGetKey(this->m_Engine->GetWindow(), GLFW_KEY_T))
+            this->GetPlayer()->FrustrumC += 0.01;
+        if (glfwGetKey(this->m_Engine->GetWindow(), GLFW_KEY_Y))
+            this->GetPlayer()->FrustrumC -= 0.01;
+        if (glfwGetKey(this->m_Engine->GetWindow(), GLFW_KEY_U))
+            this->GetPlayer()->FrustrumD += 0.1;
+        if (glfwGetKey(this->m_Engine->GetWindow(), GLFW_KEY_I))
+            this->GetPlayer()->FrustrumD -= 0.1;*/
         this->GetPlayer()->Resynchronise();
     }
 
@@ -116,6 +152,7 @@ void GameplayState::Render()
     universe_state << "Universe state is: " << u.Status;
 
     // Draw world.
+    glColor3f(0.2f, 0, 0);
     if (this->GetPlayer() != NULL && this->GetUniverse() != NULL)
         GameplayRenderingEngine::Render(*this->GetPlayer(), *this->GetUniverse());
     else
@@ -131,4 +168,30 @@ void GameplayState::Render()
     glutBitmapString(GLUT_BITMAP_HELVETICA_12, (const unsigned char*)player_state.str().c_str());
     glWindowPos2i(10, height - 20 - 30);
     glutBitmapString(GLUT_BITMAP_HELVETICA_12, (const unsigned char*)universe_state.str().c_str());
+    if (this->GetPlayer() != NULL)
+    {
+        /*std::stringstream fa, fb, fc, fd;
+        fa << "Frustrum A:" << this->GetPlayer()->FrustrumA;
+        fb << "Frustrum B:" << this->GetPlayer()->FrustrumB;
+        fc << "Frustrum C:" << this->GetPlayer()->FrustrumC;
+        fd << "Frustrum D:" << this->GetPlayer()->FrustrumD;
+
+        int a = height - 20 - 30 - 24;
+
+        glWindowPos2i(10, a);
+        glutBitmapString(GLUT_BITMAP_HELVETICA_12, (const unsigned char*)fa.str().c_str());
+        a -= 24;
+
+        glWindowPos2i(10, a);
+        glutBitmapString(GLUT_BITMAP_HELVETICA_12, (const unsigned char*)fb.str().c_str());
+        a -= 24;
+
+        glWindowPos2i(10, a);
+        glutBitmapString(GLUT_BITMAP_HELVETICA_12, (const unsigned char*)fc.str().c_str());
+        a -= 24;
+
+        glWindowPos2i(10, a);
+        glutBitmapString(GLUT_BITMAP_HELVETICA_12, (const unsigned char*)fd.str().c_str());
+        a -= 24;*/
+    }
 }

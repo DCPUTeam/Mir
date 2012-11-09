@@ -7,7 +7,8 @@
 #include <GL/glfw3.h>
 #include "Engine.h"
 #include "Network/Controller.h"
-#include "Network/PlayerJoinMessage.h"
+#include "Network/Messages/PlayerJoinMessage.h"
+#include "TextureManager.h"
 
 Engine::Engine()
     : m_Controller(NULL), m_CurrentState(NULL)
@@ -61,6 +62,10 @@ Engine::Engine()
             exit(1);
         }
     }
+
+    // Load textures!
+    TextureManager::LoadTexture("starfield", "Resources/Textures/Starfield.png");
+    TextureManager::LoadTexture("planet", "Resources/Textures/Planet.png");
 }
 
 Engine::~Engine()

@@ -5,7 +5,13 @@
 #include <GL/glew.h>
 #include <GL/glfw3.h>
 #include <GL/glut.h>
+extern "C"
+{
+#include <GL/GLU.h>
+}
 #include "GameplayRenderingEngine.h"
+
+#ifdef OLD
 
 /*
  * Example code taken from http://content.gpwiki.org/index.php/GLFW:Tutorials:Basics#An_Example
@@ -19,17 +25,26 @@ const float rotations_per_tick = .2f;
 void Draw_Square(float red, float green, float blue)
 {
     // Draws a square with a gradient color at coordinates 0, 10
+    glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_TEXTURE_2D);
     glBegin(GL_QUADS);
     {
+        glNormal3f(0.0, 0.0, 1.0);
         glColor3f(red, green, blue);
+        glTexCoord2d(0.05, 0.05);
         glVertex2i(1, 11);
         glColor3f(red * .8, green * .8, blue * .8);
+        glTexCoord2d(0.05, 0);
         glVertex2i(-1, 11);
         glColor3f(red * .5, green * .5, blue * .5);
+        glTexCoord2d(0, 0);
         glVertex2i(-1, 9);
         glColor3f(red * .8, green * .8, blue * .8);
+        glTexCoord2d(0, 0.05);
         glVertex2i(1, 9);
     }
+    glDisable(GL_TEXTURE_2D);
+    glPopAttrib();
     glEnd();
 }
 
@@ -79,4 +94,73 @@ void GameplayRenderingEngine::Render(CachedPlayer& player, CachedUniverse& unive
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // draw the figure
     Draw();
+}
+
+#endif
+
+void GameplayRenderingEngine::Init()
+{
+    glShadeModel(GL_SMOOTH);
+    glEnable(GL_DEPTH_TEST);
+}
+
+void GameplayRenderingEngine::Deinit()
+{
+}
+
+void GameplayRenderingEngine::Render(CachedPlayer& player, CachedUniverse& universe)
+{
+    // Set up the projection matrix.
+    glViewport(0, 0, (GLsizei)800, (GLsizei)600);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glFrustum(-2, 2, -2, 2, 1.5, 50);
+    glMatrixMode(GL_MODELVIEW);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Set up the model viewing matrix.
+    glLoadIdentity();
+    gluLookAt(
+        player.X + cos(player.CameraRotation / 180.f * (2 * 3.14f)) * 5.3,
+        player.Y + sqrt(pow(player.CameraDistance, 2) * 2),
+        player.Z + sin(player.CameraRotation / 180.f * (2 * 3.14f)) * 5.3,
+        player.X,
+        player.Y,
+        player.Z,
+        0,
+        1,
+        0);
+
+    // Push matrix to maintain it while drawing things.
+    glPushMatrix();
+
+    // Draw universe.
+    //universe.Render();
+
+    // Draw player.
+    //player.Render();
+    //glTranslatef(-player.X, -player.Y, -player.Z);
+    //glRotatef(3.14f / 4.f, 0, 0, 1);
+    //glRotatef(3.14f / 4.f, 0, 1, 0);
+    std::cout << "Rendering at " << player.X << ", " << player.Y << ", " << player.Z << "." << std::endl;
+
+    glColor3f(0, 1, 0);
+    glPushMatrix();
+    glTranslatef(player.X, player.Y, player.Z);
+    glutSolidCube(0.5);
+    glPopMatrix();
+
+    glColor3f(1, 0, 0);
+    for (int x = -10; x < 10; x++)
+        for (int z = -10; z < 10; z++)
+        {
+            glPushMatrix();
+            //glRotatef(player.RotTest, 0, 1, 0);
+            glTranslatef(x, 0, z);
+            glutSolidCube(0.5);
+            glPopMatrix();
+        }
+
+    // Finished rendering, pop matrix.
+    glPopMatrix();
 }

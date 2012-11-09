@@ -8,11 +8,11 @@
 #include <cassert>
 #include <sstream>
 #include "Controller.h"
-#include "CreateMessage.h"
-#include "PlayerJoinMessage.h"
-#include "RequestMessage.h"
-#include "NotFoundMessage.h"
-#include "RepositionMessage.h"
+#include "Messages/CreateMessage.h"
+#include "Messages/PlayerJoinMessage.h"
+#include "Messages/RequestMessage.h"
+#include "Messages/NotFoundMessage.h"
+#include "Messages/RepositionMessage.h"
 
 namespace Network
 {
@@ -43,6 +43,7 @@ namespace Network
                 tcp::resolver resolver(*this->m_IOService);
                 std::stringstream port_str;
                 port_str << port;
+                std::cout << "Resolving " << address << ":" << port_str.str() << "." << std::endl;
                 tcp::resolver::query query(address, port_str.str());
                 tcp::resolver::iterator iterator = resolver.resolve(query);
                 this->m_TCPClient = new Internal::tcp_client(*this, *this->m_IOService, iterator);
@@ -133,6 +134,21 @@ namespace Network
             // Create the new object.  The object is automatically registered
             // by it's constructor.
             this->m_ObjectTranslation.CreateByType(*this, create.Type, create.Identifier);
+
+            // HACK: If we have a universe object, send this message to that
+            // object as well.
+            if (create.Type != "Universe" && this->m_LocalObjects != NULL)
+            {
+                for (std::map<std::string, IdentifiableObject*>::const_iterator i = this->m_LocalObjects->begin();
+                        i != this->m_LocalObjects->end(); i++)
+                {
+                    if (i->first == "universe")
+                    {
+                        i->second->ReceiveMessage(create);
+                        break;
+                    }
+                }
+            }
         }
         else if (message_type == typeid(RequestMessage).name())
         {

@@ -6,7 +6,7 @@
 #define __DCPU_GAME_NETWORKING_PLAYER_JOIN_MESSAGE_H
 
 #include <string>
-#include "Message.h"
+#include "../Message.h"
 
 namespace Network
 {

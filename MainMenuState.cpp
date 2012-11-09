@@ -55,7 +55,6 @@ void MainMenuState::Update()
         if (glfwGetKey(this->m_Engine->GetWindow(), GLFW_KEY_ENTER) && this->m_KeyboardBuffer.length() > 0)
         {
             // Tell the engine to connect.
-            this->m_KeyboardBuffer = "";
             this->m_Status = "Resolving hostname...";
             this->m_State = STATE_RESOLVING;
         }
@@ -63,6 +62,7 @@ void MainMenuState::Update()
     else if (this->m_State == STATE_RESOLVING)
     {
         this->m_Engine->Connect(this->m_KeyboardBuffer, 5055);
+        this->m_KeyboardBuffer = "";
         this->m_Status = "Connecting to server...";
         this->m_State = STATE_CONNECTING;
     }

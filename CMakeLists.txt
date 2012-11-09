@@ -20,6 +20,7 @@ include_directories(
     ${glew_SOURCE_DIR}
     ${GLFW_SOURCE_DIR}/include
     ${png_SOURCE_DIR}
+    ${png_BINARY_DIR}
     ${z_SOURCE_DIR}
 )
 add_library(mir-network STATIC
@@ -39,21 +40,20 @@ add_library(mir-network STATIC
     Network/Internal/tcp_client_connection.cpp
     Network/Internal/tcp_client.h
     Network/Internal/tcp_client.cpp
-    Network/CreateMessage.h
-    Network/CreateMessage.cpp
+    Network/Messages/CreateMessage.h
+    Network/Messages/CreateMessage.cpp
     Network/ObjectTranslation.h
-    Network/PlayerJoinMessage.h
-    Network/PlayerJoinMessage.cpp
-    Network/RequestMessage.h
-    Network/RequestMessage.cpp
-    Network/NotFoundMessage.h
-    Network/NotFoundMessage.cpp
-    Network/RepositionMessage.h
-    Network/RepositionMessage.cpp
+    Network/Messages/PlayerJoinMessage.h
+    Network/Messages/PlayerJoinMessage.cpp
+    Network/Messages/RequestMessage.h
+    Network/Messages/RequestMessage.cpp
+    Network/Messages/NotFoundMessage.h
+    Network/Messages/NotFoundMessage.cpp
+    Network/Messages/RepositionMessage.h
+    Network/Messages/RepositionMessage.cpp
     Network/ObjectMessage.h
-    Network/ObjectMessage.cpp
     Network/Source.h
-    Network/Source.cpp
+    Network/UpdatableObject.h
 )
 add_executable(mir
     Main.cpp
@@ -67,6 +67,15 @@ add_executable(mir
     CachedPlayer.cpp
     CachedShip.h
     CachedShip.cpp
+    CachedCelestialBody.h
+    CachedPlanet.h
+    CachedPlanet.cpp
+    CachedStar.h
+    CachedStar.cpp
+    CachedAsteroid.h
+    CachedAsteroid.cpp
+    CachedAsteroidBelt.h
+    CachedAsteroidBelt.cpp
     ClientObjectTranslation.h
     ClientObjectTranslation.cpp
     BaseState.h
@@ -76,6 +85,9 @@ add_executable(mir
     GameplayRenderingEngine.cpp
     MainMenuState.h
     MainMenuState.cpp
+    RenderableObject.h
+    TextureManager.h
+    TextureManager.cpp
 )
 add_executable(mir-server
     Server/Main.cpp
@@ -87,9 +99,24 @@ add_executable(mir-server
     Server/Player.cpp
     Server/Ship.h
     Server/Ship.cpp
+    Server/CelestialBody.h
+    Server/Planet.h
+    Server/Planet.cpp
+    Server/Star.h
+    Server/Star.cpp
+    Server/Asteroid.h
+    Server/Asteroid.cpp
+    Server/AsteroidBelt.h
+    Server/AsteroidBelt.cpp
     Server/ServerObjectTranslation.h
     Server/ServerObjectTranslation.cpp
 )
+set(mir-network_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Network)
+set(mir-server_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Server)
+auto_group(mir-network)
+auto_group(mir)
+auto_group(mir-server)
+
 target_link_libraries(mir-network
     ${Boost_LIBRARIES}
 )
@@ -114,3 +141,8 @@ endif()
 cotire(mir-network)
 cotire(mir)
 cotire(mir-server)
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Textures/Starfield.png
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Resources/Textures/)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Textures/Planet.png
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Resources/Textures/)

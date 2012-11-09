@@ -3,8 +3,8 @@
 /// @author James Rhodes
 ///
 
-#ifndef __MIR_CACHED_SPATIAL_H
-#define __MIR_CACHED_SPATIAL_H
+#ifndef __MIR_SPATIAL_OBJECT_H
+#define __MIR_SPATIAL_OBJECT_H
 
 #include "IdentifiableObject.h"
 

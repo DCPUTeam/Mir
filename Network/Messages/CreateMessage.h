@@ -6,7 +6,7 @@
 #define __DCPU_GAME_NETWORKING_CREATE_MESSAGE_H
 
 #include <string>
-#include "ObjectMessage.h"
+#include "../ObjectMessage.h"
 
 namespace Network
 {

@@ -11,6 +11,8 @@
 class GameplayRenderingEngine
 {
 public:
+    static void Init();
+    static void Deinit();
     static void Render(CachedPlayer& player, CachedUniverse& universe);
 };
 
