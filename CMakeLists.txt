@@ -154,9 +154,6 @@ else()
         pthread)
 endif()
 cotire(mir-network)
-if(NOT ${SERVER_ONLY})
-    cotire(mir)
-endif()
 cotire(mir-server)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Textures/Starfield.png

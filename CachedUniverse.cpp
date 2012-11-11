@@ -53,7 +53,7 @@ void CachedUniverse::Render()
         GLUquadricObj* sphere = NULL;
         sphere = gluNewQuadric();
         gluQuadricDrawStyle(sphere, GLU_FILL);
-        gluQuadricTexture(sphere, TRUE);
+        gluQuadricTexture(sphere, true);
         gluQuadricNormals(sphere, GLU_SMOOTH);
         this->m_SphereID = glGenLists(1);
         glNewList(this->m_SphereID, GL_COMPILE);

@@ -33,8 +33,8 @@ public:
     bool IsRunning();
     void Run();
     void Cleanup();
-    void Engine::Connect(std::string address, int port);
-    void Engine::Disconnect();
+    void Connect(std::string address, int port);
+    void Disconnect();
     void Switch(BaseState* state);
     GLFWwindow& GetWindow();
     bool HasNetworkController();

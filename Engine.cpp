@@ -49,10 +49,6 @@ Engine::Engine()
         std::cout << "OpenGL 3.1: " << (GLEW_VERSION_3_1 ? "Available" : "MISSING") << std::endl;
         std::cout << "OpenGL 3.2: " << (GLEW_VERSION_3_2 ? "Available" : "MISSING") << std::endl;
         std::cout << "OpenGL 3.3: " << (GLEW_VERSION_3_3 ? "Available" : "MISSING") << std::endl;
-        std::cout << "OpenGL 4.0: " << (GLEW_VERSION_4_0 ? "Available" : "MISSING") << std::endl;
-        std::cout << "OpenGL 4.1: " << (GLEW_VERSION_4_1 ? "Available" : "MISSING") << std::endl;
-        std::cout << "OpenGL 4.2: " << (GLEW_VERSION_4_2 ? "Available" : "MISSING") << std::endl;
-        std::cout << "OpenGL 4.3: " << (GLEW_VERSION_4_3 ? "Available" : "MISSING") << std::endl;
         if (GLEW_VERSION_1_4)
             std::cout << "Result: OK!" << std::endl;
         else

@@ -5,10 +5,12 @@
 #include <GL/glew.h>
 #include <GL/glfw3.h>
 #include <GL/glut.h>
+#ifdef WIN32
 extern "C"
 {
 #include <GL/GLU.h>
 }
+#endif
 #include "GameplayRenderingEngine.h"
 
 #ifdef OLD

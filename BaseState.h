@@ -18,6 +18,7 @@ protected:
 public:
     BaseState(Engine* engine)
         : m_Engine(engine) { }
+    virtual ~BaseState() { }
     virtual void Activate() = 0;
     virtual void Deactivate() = 0;
     virtual void Render() = 0;
