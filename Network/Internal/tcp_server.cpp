@@ -18,15 +18,43 @@ namespace Network
             this->m_Controller.SetConnectionStatus(false, true);
         }
         
-        void tcp_server::broadcast(Source* except, std::string data)
+        void tcp_server::broadcast(Source target, std::string data)
         {
             for (std::list<tcp_server_connection::pointer>::const_iterator i = this->m_Clients.begin();
                 i != this->m_Clients.end(); i++)
             {
-                if (except != NULL && *i == except->Client)
-                    continue;
-                (*i)->broadcast(data);
+                if (*i == target.Client)
+                {
+                    (*i)->broadcast(data);
+                    break;
+                }
             }
+        }
+        
+        void tcp_server::broadcast_except(Source except, std::string data)
+        {
+            for (std::list<tcp_server_connection::pointer>::const_iterator i = this->m_Clients.begin();
+                i != this->m_Clients.end(); i++)
+            {
+                if (*i != except.Client)
+                    (*i)->broadcast(data);
+            }
+        }
+        
+        void tcp_server::broadcast_all(std::string data)
+        {
+            for (std::list<tcp_server_connection::pointer>::const_iterator i = this->m_Clients.begin();
+                i != this->m_Clients.end(); i++)
+                (*i)->broadcast(data);
+        }
+        
+        std::list<Source> tcp_server::clients()
+        {
+            std::list<Source> result;
+            for (std::list<tcp_server_connection::pointer>::const_iterator i = this->m_Clients.begin();
+                i != this->m_Clients.end(); i++)
+                 result.insert(result.end(), Source(*i));
+            return result;
         }
 
         void tcp_server::start_accept()

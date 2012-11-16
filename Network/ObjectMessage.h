@@ -14,7 +14,7 @@ namespace Network
     class ObjectMessage : public Message
     {
     public:
-        ObjectMessage(Source* source)
+        ObjectMessage(Source source)
             : Message(source) { }
         ObjectMessage(bool reliable)
             : Message(reliable) { }

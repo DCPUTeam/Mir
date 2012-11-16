@@ -21,9 +21,6 @@
 class CachedUniverse : public Network::IdentifiableObject, public Network::UpdatableObject, public RenderableObject
 {
 private:
-    std::list<CachedActor*> m_CachedActors;
-    std::list<CachedShip*> m_CachedShips;
-    std::list<CachedCelestialBody*> m_CachedCelestialBodies;
     Network::Controller* m_Controller;
     bool m_SphereGenerated;
     int m_SphereID;

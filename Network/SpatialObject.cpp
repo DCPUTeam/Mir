@@ -4,7 +4,7 @@
 ///
 
 #include "SpatialObject.h"
-#include "Messages/RepositionMessage.h"
+#include <Messages/Declarations.h>
 
 namespace Network
 {

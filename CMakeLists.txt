@@ -9,6 +9,7 @@ if(NOT ${SERVER_ONLY})
     add_subdirectory(third-party/freeglut)
     add_subdirectory(third-party/glew)
 endif()
+add_subdirectory(tool-msggen)
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
@@ -28,6 +29,20 @@ include_directories(
     ${png_SOURCE_DIR}
     ${png_BINARY_DIR}
     ${z_SOURCE_DIR}
+    ${mir_SOURCE_DIR}/Network
+    ${mir_BINARY_DIR}/Network
+)
+file(MAKE_DIRECTORY ${mir_BINARY_DIR}/Network/Messages)
+generate_messages(
+    # Output files
+    Network/Messages/Declarations.h
+    Network/Messages/Definitions.cpp
+    # Message sources
+    Network/Messages/PlayerJoinMessage.d
+    Network/Messages/RequestMessage.d
+    Network/Messages/CreateMessage.d
+    Network/Messages/NotFoundMessage.d
+    Network/Messages/RepositionMessage.d
 )
 add_library(mir-network STATIC
     Network/Message.h
@@ -42,21 +57,21 @@ add_library(mir-network STATIC
     Network/Internal/tcp_server_connection.cpp
     Network/Internal/tcp_server.h
     Network/Internal/tcp_server.cpp
-    Network/Internal/tcp_client_connection.h
-    Network/Internal/tcp_client_connection.cpp
     Network/Internal/tcp_client.h
     Network/Internal/tcp_client.cpp
-    Network/Messages/CreateMessage.h
-    Network/Messages/CreateMessage.cpp
+    #Network/Messages/CreateMessage.h
+    #Network/Messages/CreateMessage.cpp
     Network/ObjectTranslation.h
-    Network/Messages/PlayerJoinMessage.h
-    Network/Messages/PlayerJoinMessage.cpp
-    Network/Messages/RequestMessage.h
-    Network/Messages/RequestMessage.cpp
-    Network/Messages/NotFoundMessage.h
-    Network/Messages/NotFoundMessage.cpp
-    Network/Messages/RepositionMessage.h
-    Network/Messages/RepositionMessage.cpp
+    ${mir_BINARY_DIR}/Network/Messages/Declarations.h
+    ${mir_BINARY_DIR}/Network/Messages/Definitions.cpp
+    #Network/Messages/PlayerJoinMessage.h
+    #Network/Messages/PlayerJoinMessage.cpp
+    #Network/Messages/RequestMessage.h
+    #Network/Messages/RequestMessage.cpp
+    #Network/Messages/NotFoundMessage.h
+    #Network/Messages/NotFoundMessage.cpp
+    #Network/Messages/RepositionMessage.h
+    #Network/Messages/RepositionMessage.cpp
     Network/ObjectMessage.h
     Network/Source.h
     Network/UpdatableObject.h

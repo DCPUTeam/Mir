@@ -142,7 +142,7 @@ namespace Network
             this->read_header();
 
             // Tell the controller that we have received a message.
-            this->m_Controller.ReceiveData(new Source(this), length,  data);
+            this->m_Controller.ReceiveData(Source(this), length,  data);
         }
 
         tcp_server_connection::tcp_server_connection(Controller& controller, boost::asio::io_service& io_service)

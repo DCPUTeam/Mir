@@ -7,7 +7,7 @@
 #include <GL/glfw3.h>
 #include "Engine.h"
 #include "Network/Controller.h"
-#include "Network/Messages/PlayerJoinMessage.h"
+#include <Messages/Declarations.h>
 #include "TextureManager.h"
 
 Engine::Engine()

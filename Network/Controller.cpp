@@ -8,11 +8,7 @@
 #include <cassert>
 #include <sstream>
 #include "Controller.h"
-#include "Messages/CreateMessage.h"
-#include "Messages/PlayerJoinMessage.h"
-#include "Messages/RequestMessage.h"
-#include "Messages/NotFoundMessage.h"
-#include "Messages/RepositionMessage.h"
+#include <Messages/Declarations.h>
 
 namespace Network
 {
@@ -96,7 +92,12 @@ namespace Network
         if (this->m_Mode == ControllerMode::Server)
         {
             // Broadcast message to all connected clients.
-            this->m_TCPServer->broadcast(message.GetSource(), serialized);
+            std::list<Source> clients = this->m_TCPServer->clients();
+            for (Internal::tcp_server::client_iterator i = clients.begin(); i != clients.end(); i++)
+            {
+                if (*i != message.GetSource())
+                    this->m_TCPServer->broadcast(*i, serialized);
+            }
         }
         else if (this->m_Mode == ControllerMode::Client)
         {
@@ -105,7 +106,7 @@ namespace Network
         }
     }
 
-    void Controller::ReceiveData(Source* source, size_t length, char* data)
+    void Controller::ReceiveData(Source source, size_t length, char* data)
     {
         // Convert the raw data into an std::string.
         std::string message(data, length);

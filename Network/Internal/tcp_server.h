@@ -33,7 +33,11 @@ namespace Network
         {
         public:
             tcp_server(Controller& controller, boost::asio::io_service& io_service, int port);
-            void broadcast(Source* except, std::string data);
+            void broadcast(Network::Source target, std::string data);
+            void broadcast_except(Network::Source except, std::string data);
+            void broadcast_all(std::string data);
+            std::list<Source> clients();
+            typedef std::list<Source>::const_iterator client_iterator;
         private:
             void start_accept();
             void handle_accept(tcp_server_connection::pointer new_connection,

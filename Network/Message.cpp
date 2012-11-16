@@ -14,7 +14,7 @@ namespace Network
     /// @brief Constructor used for deserialization.
     /// @internal
     ///
-    Message::Message(Source* source)
+    Message::Message(Network::Source source)
     {
         this->m_Source = source;
         this->m_Reliable = false;
@@ -27,14 +27,14 @@ namespace Network
     ///
     Message::Message(bool reliable)
     {
-        this->m_Source = NULL;
+        this->m_Source = Source();
         this->m_Reliable = reliable;
     }
 
     ///
     /// @brief Returns the current message.
     ///
-    Source* Message::GetSource()
+    Source Message::GetSource()
     {
         return this->m_Source;
     }

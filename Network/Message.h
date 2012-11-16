@@ -14,15 +14,15 @@ namespace Network
     class Message
     {
     private:
-        Source* m_Source;
+        Source m_Source;
         bool m_Reliable;
     public:
-        Message(Source* source);
+        Message(Source source);
         Message(bool reliable);
         virtual std::string Serialize() = 0;
         virtual void Deserialize(std::string data) = 0;
         virtual int GetHashCode() = 0;
-        Source* GetSource();
+        Source GetSource();
     };
 }
 

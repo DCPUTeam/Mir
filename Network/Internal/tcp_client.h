@@ -20,7 +20,6 @@ namespace Network
 #include <iostream>
 #include <boost/array.hpp>
 #include <boost/asio.hpp>
-#include "tcp_client_connection.h"
 
 using boost::asio::ip::tcp;
 

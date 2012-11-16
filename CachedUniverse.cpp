@@ -6,7 +6,7 @@
 #include <GL/glfw3.h>
 #include <GL/glut.h>
 #include "CachedUniverse.h"
-#include "Network/Messages/CreateMessage.h"
+#include <Messages/Declarations.h>
 #include "Network/Controller.h"
 
 void CachedUniverse::ReceiveMessage(Network::Message& message)
@@ -14,7 +14,7 @@ void CachedUniverse::ReceiveMessage(Network::Message& message)
     // Handle messages.
     if (typeid(message) == typeid(Network::CreateMessage))
     {
-        Network::CreateMessage& create = (Network::CreateMessage&)message;
+        /*Network::CreateMessage& create = (Network::CreateMessage&)message;
         Network::RequestState& request = this->m_Controller->Request(create.Identifier);
         if (request.Status != Network::REQUEST_STATUS_AVAILABLE)
             return; // No idea what went wrong here...
@@ -22,19 +22,19 @@ void CachedUniverse::ReceiveMessage(Network::Message& message)
             this->m_CachedShips.insert(this->m_CachedShips.end(), (CachedShip*)request.Reference);
         else if (create.Type == "Actor")
             this->m_CachedActors.insert(this->m_CachedActors.end(), (CachedActor*)request.Reference);
-        else if (create.Type == "Planet" /* || ... */)
+        else if (create.Type == "Planet" / || ... *)
             this->m_CachedCelestialBodies.insert(this->m_CachedCelestialBodies.end(), (CachedCelestialBody*)request.Reference);
         else
         {
             std::cout << "Universe not taking reference to '" << create.Type << "'." << std::endl;
-        }
+        }*/
     }
     std::cout << "NOTE: CachedUniverse just received a message!" << std::endl;
 }
 
 void CachedUniverse::Update()
 {
-    for (std::list<CachedCelestialBody*>::iterator i = this->m_CachedCelestialBodies.begin();
+    /*for (std::list<CachedCelestialBody*>::iterator i = this->m_CachedCelestialBodies.begin();
         i != this->m_CachedCelestialBodies.end(); i++)
         (*i)->Update();
     for (std::list<CachedActor*>::iterator i = this->m_CachedActors.begin();
@@ -42,7 +42,7 @@ void CachedUniverse::Update()
         (*i)->Update();
     for (std::list<CachedShip*>::iterator i = this->m_CachedShips.begin();
         i != this->m_CachedShips.end(); i++)
-        (*i)->Update();
+        (*i)->Update();*/
 }
 
 void CachedUniverse::Render()
@@ -64,7 +64,7 @@ void CachedUniverse::Render()
     glCallList(this->m_SphereID);
 
     // Render entities.
-    for (std::list<CachedCelestialBody*>::iterator i = this->m_CachedCelestialBodies.begin();
+    /*for (std::list<CachedCelestialBody*>::iterator i = this->m_CachedCelestialBodies.begin();
         i != this->m_CachedCelestialBodies.end(); i++)
         (*i)->Render();
     for (std::list<CachedActor*>::iterator i = this->m_CachedActors.begin();
@@ -72,5 +72,5 @@ void CachedUniverse::Render()
         (*i)->Render();
     for (std::list<CachedShip*>::iterator i = this->m_CachedShips.begin();
         i != this->m_CachedShips.end(); i++)
-        (*i)->Render();
+        (*i)->Render();*/
 }

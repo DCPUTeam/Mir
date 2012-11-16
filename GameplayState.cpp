@@ -10,7 +10,7 @@
 #include "GameplayState.h"
 #include "GameplayRenderingEngine.h"
 #include "MainMenuState.h"
-#include "Network/Messages/PlayerJoinMessage.h"
+#include <Messages/Declarations.h>
 
 CachedPlayer* GameplayState::GetPlayer()
 {
@@ -128,7 +128,7 @@ void GameplayState::Update()
     // Test player join.
     if (glfwGetKey(this->m_Engine->GetWindow(), GLFW_KEY_SPACE))
     {
-        Network::PlayerJoinMessage message;
+        Network::PlayerJoinMessage message("");
         this->m_Engine->GetNetworkController().SendMessage(message);
     }
 }

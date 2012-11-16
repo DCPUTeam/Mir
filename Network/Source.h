@@ -16,7 +16,17 @@ namespace Network
         Source() { };
         Source(Internal::tcp_server_connection* p)
             : Client(p) { };
+        Source(Internal::tcp_server_connection::pointer p)
+            : Client(p) { };
         Internal::tcp_server_connection::pointer Client;
+        inline bool operator==(const Source& other) const
+        {
+            return (other.Client == this->Client);
+        }
+        inline bool operator!=(const Source& other) const
+        {
+            return !(other == *this);
+        }
     };
 }
 
