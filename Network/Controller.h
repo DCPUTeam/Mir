@@ -84,6 +84,7 @@ namespace Network
         Internal::tcp_client* m_TCPClient;
         ObjectTranslation& m_ObjectTranslation;
         int m_ConnectionPort;
+        IdentifiableObject* m_GlobalHandler;
 
         void SendMessage(std::string id, Message& message);
     public:
@@ -104,6 +105,9 @@ namespace Network
         bool IsServer();
 
         RequestState& Request(std::string identifier);
+        std::list<IdentifiableObject*> GetKnownObjects();
+        void SetGlobalHandler(IdentifiableObject* handler);
+        IdentifiableObject* GetGlobalHandler();
 
 #ifdef MIR_NETWORK_CONTROLLER_INTERNALS
         void SetConnectionStatus(bool connecting, bool connected);

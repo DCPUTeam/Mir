@@ -13,7 +13,8 @@
 namespace Network
 {
     Controller::Controller(ControllerMode::Type mode, ObjectTranslation& translation, std::string address, int port)
-        : m_Mode(mode), m_ConnectionAddress(address), m_ConnectionPort(port), ServerRunning(true), m_ObjectTranslation(translation), Connected(false), Connecting(true)
+        : m_Mode(mode), m_ConnectionAddress(address), m_ConnectionPort(port), ServerRunning(true),
+          m_ObjectTranslation(translation), Connected(false), Connecting(true), m_GlobalHandler(NULL)
     {
         // Initialize the local object or request cache mappings.
         if (this->m_Mode == ControllerMode::Server)
@@ -72,18 +73,7 @@ namespace Network
     void Controller::SendMessage(std::string id, Message& message)
     {
         std::string data = message.Serialize();
-
-        std::string name;
-        if (typeid(message) == typeid(CreateMessage))
-            name = "class Network::CreateMessage";
-        else if (typeid(message) == typeid(NotFoundMessage))
-            name = "class Network::NotFoundMessage";
-        else if (typeid(message) == typeid(RepositionMessage))
-            name = "class Network::RepositionMessage";
-        else if (typeid(message) == typeid(RequestMessage))
-            name = "class Network::RequestMessage";
-        else if (typeid(message) == typeid(PlayerJoinMessage))
-            name = "class Network::PlayerJoinMessage";
+        std::string name = Messages::GetType(message);
 
         // Construct serialized representation.
         std::string serialized = std::string(name) + "\1" + id + "\1" + data;
@@ -128,89 +118,68 @@ namespace Network
         // Pull out the owner ID.
         std::string message_owner = message.substr(0, at);
         message = message.substr(at + 1);
-
-        // The rest of the message is the message data.  Reconstruct
-        // based on the type.
-        if (message_type == "class Network::CreateMessage")
+        
+        // Deserialize based on the type.
+        ObjectMessage* result = Messages::DeserializeByType(source, message_type, message);
+        if (result == NULL)
         {
-            // Check whether it's valid for this mode.
-            if (this->m_Mode != ControllerMode::Client)
-                return;
-
-            // This is a special creation message; the owner ID
-            // is currently unused, but we need to create the new
-            // object, depending on it's type.  First however, we need
-            // to create a new CreateMessage and deserialize.
-            CreateMessage create(source);
-            create.Deserialize(message);
-
-            // Create the new object.  The object is automatically registered
-            // by it's constructor.
-            this->m_ObjectTranslation.CreateByType(*this, create.Type, create.Identifier);
-
-            // HACK: If we have a universe object, send this message to that
-            // object as well.
-            if (create.Type != "Universe" && this->m_LocalObjects != NULL)
+            std::cerr << "UNKNOWN MESSAGE TYPE RECEIVED '" << message_type << "'." << std::endl;
+            return;
+        }
+        
+        // If the result has a non-blank identifier, search for that object and send
+        // the message to it.
+        if (result->Identifier == "" || result->IsGlobal())
+            this->ReceiveMessage(*result);
+        else
+        {
+            // This message needs to be sent to an object.
+            if (this->m_LocalObjects != NULL)
             {
                 for (std::map<std::string, IdentifiableObject*>::const_iterator i = this->m_LocalObjects->begin();
                         i != this->m_LocalObjects->end(); i++)
                 {
-                    if (i->first == "universe")
+                    if (i->second == NULL)
+                        continue;
+                    if (i->first == result->Identifier)
                     {
-                        i->second->ReceiveMessage(create);
-                        break;
+                        i->second->ReceiveMessage(*result);
+                        delete result;
+                        return;
                     }
                 }
             }
-        }
-        else if (message_type == "class Network::RequestMessage")
-        {
-            // Check whether it's valid for this mode.
-            if (this->m_Mode != ControllerMode::Server)
-                return;
 
-            // Deserialize request message.
-            RequestMessage request(source);
-            request.Deserialize(message);
-            this->ReceiveMessage(request);
+            for (std::map<std::string, RequestState*>::const_iterator i = this->m_RequestCache->begin();
+                    i != this->m_RequestCache->end(); i++)
+            {
+                if (i->second == NULL)
+                    continue;
+                if (i->first == result->Identifier)
+                    if (i->second->Status == REQUEST_STATUS_AVAILABLE)
+                    {
+                        i->second->Reference->ReceiveMessage(*result);
+                        delete result;
+                        return;
+                    }
+            }
+            
+            // FIXME: Use a proper logging system.
+            std::cerr << "Silently dropping message of type '" << Messages::GetType(*result) << "'." << std::endl;
         }
-        else if (message_type == "class Network::NotFoundMessage")
-        {
-            // Check whether it's valid for this mode.
-            if (this->m_Mode != ControllerMode::Client)
-                return;
-
-            // Deserialize the not found message.
-            NotFoundMessage notfound(source);
-            notfound.Deserialize(message);
-            this->ReceiveMessage(notfound);
-        }
-        else if (message_type == "class Network::PlayerJoinMessage")
-        {
-            // Check whether it's valid for this mode.
-            if (this->m_Mode != ControllerMode::Server)
-                return;
-
-            // Deserialize player join message.
-            PlayerJoinMessage player_join(source);
-            player_join.Deserialize(message);
-            this->ReceiveMessage(player_join);
-        }
-        else if (message_type == "class Network::RepositionMessage")
-        {
-            // Deserialize reposition messsage.
-            RepositionMessage repos(source);
-            repos.Deserialize(message);
-            this->ReceiveMessage(repos);
-        }
+        
+        // Delete the message from memory.
+        delete result;
     }
 
     void Controller::ReceiveMessage(Network::Message& message)
     {
-        // Handle requests for objects.
-        if (typeid(message) == typeid(RequestMessage))
+        // Handle global messages.
+        if (Messages::GetType(message) == Messages::ID_REQUESTMESSAGE)
         {
-            //std::cout << "Server recieved a message of type " << typeid(message).name() << "!" << std::endl;
+            // Check whether it's valid for this mode.
+            if (this->m_Mode != ControllerMode::Server)
+                return;
 
             // Attempt to find the specified object in our local object storage.
             for (std::map<std::string, IdentifiableObject*>::const_iterator i = this->m_LocalObjects->begin();
@@ -237,8 +206,26 @@ namespace Network
                 );
             this->SendMessage(notfound);
         }
-        else if (typeid(message) == typeid(NotFoundMessage))
+        else if (Messages::GetType(message) == Messages::ID_CREATEMESSAGE)
         {
+            // Check whether it's valid for this mode.
+            if (this->m_Mode != ControllerMode::Client)
+                return;
+
+            // Handle the creation of the object.
+            CreateMessage& create = (CreateMessage&)message;
+            this->m_ObjectTranslation.CreateByType(*this, create.Type, create.Identifier);
+            
+            // Also notify the global handler.
+            if (this->m_GlobalHandler != NULL)
+                this->m_GlobalHandler->ReceiveMessage(message);
+        }
+        else if (Messages::GetType(message) == Messages::ID_NOTFOUNDMESSAGE)
+        {
+            // Check whether it's valid for this mode.
+            if (this->m_Mode != ControllerMode::Client)
+                return;
+
             // Mark the request as failed in the request cache.
             for (std::map<std::string, RequestState*>::const_iterator i = this->m_RequestCache->begin();
                     i != this->m_RequestCache->end(); i++)
@@ -249,58 +236,30 @@ namespace Network
                     i->second->Status = REQUEST_STATUS_ERROR;
             }
         }
-        else if (typeid(message) == typeid(PlayerJoinMessage))
-        {
-            // Here we need to transmit the state of the universe to the client
-            // the message came from.
-            // TODO: Add source tracking into Message class and a send to one
-            // target option for tcp_server.
-            //std::cout << "Server received a message of type " << typeid(message).name() << "!" << std::endl;
-
-            //CreateMessage create;
-            //create.Identifier = "blah1234567";
-            //create.Type = "Actor";
-            //this->SendMessage(create);
-        }
-        else if (typeid(message) == typeid(RepositionMessage))
-        {
-            if (this->m_LocalObjects != NULL)
-            {
-                for (std::map<std::string, IdentifiableObject*>::const_iterator i = this->m_LocalObjects->begin();
-                        i != this->m_LocalObjects->end(); i++)
-                {
-                    if (i->second == NULL)
-                        continue;
-                    if (i->first == ((RepositionMessage&)message).Identifier)
-                    {
-                        i->second->ReceiveMessage(message);
-                        return;
-                    }
-                }
-            }
-
-            for (std::map<std::string, RequestState*>::const_iterator i = this->m_RequestCache->begin();
-                    i != this->m_RequestCache->end(); i++)
-            {
-                if (i->second == NULL)
-                    continue;
-                if (i->first == ((RepositionMessage&)message).Identifier)
-                    if (i->second->Status == REQUEST_STATUS_AVAILABLE)
-                    {
-                        i->second->Reference->ReceiveMessage(message);
-                        return;
-                    }
-            }
-        }
         else
         {
-            //std::cout << "Client received a message of type " << typeid(message).name() << "!" << std::endl;
-            std::cout << "Unknown message recieved!" << std::endl;
+            // Pass off to the global handler to manage.
+            if (this->m_GlobalHandler != NULL)
+                this->m_GlobalHandler->ReceiveMessage(message);
         }
-        
-        //std::cerr << "FIXME Controller::ReceiveMessage!" << std::endl;
     }
 
+    ///
+    /// @brief Sets the global handling object which should recieve global incoming messages.
+    ///
+    void Controller::SetGlobalHandler(IdentifiableObject* handler)
+    {
+        this->m_GlobalHandler = handler;
+    }
+    
+    ///
+    /// @brief Returns the global handling object.
+    ///
+    IdentifiableObject* Controller::GetGlobalHandler()
+    {
+        return this->m_GlobalHandler;
+    }
+        
     ///
     /// @brief Performs a single synchronisation step of the network.
     ///
@@ -428,6 +387,14 @@ namespace Network
         return *state;
     }
 
+    ///
+    /// @brief Returns a list of all known objects in the system.
+    ///
+    std::list<IdentifiableObject*> Controller::GetKnownObjects()
+    {
+        return std::list<IdentifiableObject*>();
+    }
+    
     ///
     /// @brief Returns whether the controller is currently a server.
     ///

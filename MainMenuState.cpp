@@ -49,6 +49,9 @@ void MainMenuState::Deactivate()
 
 void MainMenuState::Update()
 {
+    std::cout << this->m_Status << std::endl;
+    std::cout << this->ErrorMessage << std::endl;
+    
     // Handle enter key press.
     if (this->m_State == STATE_INPUT)
     {

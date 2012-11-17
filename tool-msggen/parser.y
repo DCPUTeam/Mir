@@ -15,12 +15,19 @@
 
 #define YYERROR_VERBOSE
 
+struct flags_option
+{
+    int reliable;
+    int global;
+};
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <simclist.h>
 #include <bstring.h>
 #include <argtable2.h>
+#include <dcpu.h>
 
 extern FILE* yyin;
 extern FILE* yyout;
@@ -38,6 +45,7 @@ struct message_entry
 {
     bstring name;
     list_t datas;
+    struct flags_option flags;
 };
 
 %}
@@ -47,15 +55,18 @@ struct message_entry
 {
     bstring word;
     list_t list;
+    struct flags_option flags;
     int token;
 }
 
 // Define our lexical token names.
-%token <token> KEYWORD_MESSAGE BRACKET_OPEN BRACKET_CLOSE SEMICOLON ERROR
+%token <token> KEYWORD_MESSAGE KEYWORD_GLOBAL KEYWORD_RELIABLE
+%token <token> BRACKET_OPEN BRACKET_CLOSE SEMICOLON ERROR
 %token <word> NAME
 
 // Define our parser types.
 %type <list> datas
+%type <flags> flags
 
 // Start at the root node.
 %start input
@@ -64,15 +75,33 @@ struct message_entry
 
 input: definitions ;
 
+flags:
+        /* empty */
+        {
+            $$.reliable = false;
+            $$.global = false;
+        } |
+        flags KEYWORD_RELIABLE
+        {
+            $1.reliable = true;
+            $$ = $1;
+        } |
+        flags KEYWORD_GLOBAL
+        {
+            $1.global = true;
+            $$ = $1;
+        } ;
+
 definitions:
         /* empty */
         {
         } |
-        definitions KEYWORD_MESSAGE NAME BRACKET_OPEN datas BRACKET_CLOSE SEMICOLON
+        definitions flags KEYWORD_MESSAGE NAME BRACKET_OPEN datas BRACKET_CLOSE SEMICOLON
         {
             struct message_entry* e = malloc(sizeof(struct message_entry));
-            e->name = $3;
-            e->datas = $5;
+            e->name = $4;
+            e->datas = $6;
+            e->flags = $2;
             list_append(&messages, e);
         } ;
         
@@ -106,7 +135,8 @@ int main(int argc, char** argv)
     struct message_entry* msg;
     struct data_entry* data;
     int nerrors, i;
-    bstring params;
+    bstring params, upper;
+    bool first;
     
     // Define arguments.
     struct arg_lit* show_help = arg_litn("h", "help", 0, 2, "Show this help.");
@@ -184,6 +214,27 @@ int main(int argc, char** argv)
     fprintf(output_header, "#include <string>\n");
     fprintf(output_header, "#include <ObjectMessage.h>\n");
     fprintf(output_header, "\n");
+    fprintf(output_header, "namespace Network\n");
+    fprintf(output_header, "{\n");
+    fprintf(output_header, "    namespace Messages\n");
+    fprintf(output_header, "    {\n");
+    list_iterator_start(&messages);
+    while (list_iterator_hasnext(&messages))
+    {
+        msg = list_iterator_next(&messages);
+        
+        upper = bstrcpy(msg->name);
+        btoupper(upper);
+        fprintf(output_header, "        extern const char* ID_%s;\n", upper->data);
+        bdestroy(upper);
+    }
+    list_iterator_stop(&messages);
+    fprintf(output_header, "        \n");
+    fprintf(output_header, "        ObjectMessage* DeserializeByType(Network::Source source, std::string type, std::string data);\n");
+    fprintf(output_header, "        std::string GetType(Message& message);\n");
+    fprintf(output_header, "    }\n");
+    fprintf(output_header, "}\n");
+    fprintf(output_header, "\n");
     
     // Define common definitions for source.
     fprintf(output_source, "\n");
@@ -200,6 +251,76 @@ int main(int argc, char** argv)
     fprintf(output_source, "{\n");
     fprintf(output_source, "    str = ss.str();\n");
     fprintf(output_source, "    return true;\n");
+    fprintf(output_source, "}\n");
+    
+    // Define deserialization API.
+    fprintf(output_source, "\n");
+    fprintf(output_source, "namespace Network\n");
+    fprintf(output_source, "{\n");
+    fprintf(output_source, "    namespace Messages\n");
+    fprintf(output_source, "    {\n");
+    list_iterator_start(&messages);
+    while (list_iterator_hasnext(&messages))
+    {
+        msg = list_iterator_next(&messages);
+        
+        upper = bstrcpy(msg->name);
+        btoupper(upper);
+        fprintf(output_source, "        const char* ID_%s = \"%s\";\n", upper->data, msg->name->data);
+        bdestroy(upper);
+    }
+    list_iterator_stop(&messages);
+    fprintf(output_source, "        \n");
+    fprintf(output_source, "        ObjectMessage* DeserializeByType(Network::Source source, std::string type, std::string data)\n");
+    fprintf(output_source, "        {\n");
+    first = true;
+    list_iterator_start(&messages);
+    while (list_iterator_hasnext(&messages))
+    {
+        msg = list_iterator_next(&messages);
+        
+        if (first)
+            fprintf(output_source, "            if ");
+        else
+            fprintf(output_source, "            else if ");
+        fprintf(output_source, "(type == \"%s\")\n", msg->name->data);
+        fprintf(output_source, "            {\n");
+        fprintf(output_source, "                %s* msg = new %s(source);\n", msg->name->data, msg->name->data);
+        fprintf(output_source, "                msg->Deserialize(data);\n");
+        fprintf(output_source, "                return msg;\n");
+        fprintf(output_source, "            }\n");
+    }
+    list_iterator_stop(&messages);
+    if (list_size(&messages) > 0)
+    {
+        fprintf(output_source, "            else\n");
+        fprintf(output_source, "                return NULL;\n");
+    }
+    fprintf(output_source, "        }\n");
+    fprintf(output_source, "        \n");
+    fprintf(output_source, "        std::string GetType(Message& message)\n");
+    fprintf(output_source, "        {\n");
+    first = true;
+    list_iterator_start(&messages);
+    while (list_iterator_hasnext(&messages))
+    {
+        msg = list_iterator_next(&messages);
+        
+        if (first)
+            fprintf(output_source, "            if ");
+        else
+            fprintf(output_source, "            else if ");
+        fprintf(output_source, "(typeid(message) == typeid(%s))\n", msg->name->data);
+        fprintf(output_source, "                return \"%s\";\n", msg->name->data);
+    }
+    list_iterator_stop(&messages);
+    if (list_size(&messages) > 0)
+    {
+        fprintf(output_source, "            else\n");
+        fprintf(output_source, "                return \"\";\n");
+    }
+    fprintf(output_source, "        }\n");
+    fprintf(output_source, "    }\n");
     fprintf(output_source, "}\n");
     fprintf(output_source, "\n");
     
@@ -233,6 +354,7 @@ int main(int argc, char** argv)
         fprintf(output_header, "        %s(Source source);\n", msg->name->data);
         fprintf(output_header, "#endif\n");
         fprintf(output_header, "        %s(std::string identifier%s);\n", msg->name->data, params->data);
+        fprintf(output_header, "        virtual ~%s() { }\n", msg->name->data);
         fprintf(output_header, "        virtual std::string Serialize();\n");
         fprintf(output_header, "        virtual void Deserialize(std::string data);\n");
         fprintf(output_header, "        virtual int GetHashCode();\n");
@@ -262,7 +384,9 @@ int main(int argc, char** argv)
                                                                          msg->name->data,
                                                                          params->data
                );
-        fprintf(output_source, "        : ObjectMessage(false)\n");
+        fprintf(output_source, "        : ObjectMessage(%s, %s)\n", msg->flags.reliable ? "true" : "false",
+                                                                                msg->flags.global ? "true" : "false"
+               );
         fprintf(output_source, "    {\n");
         fprintf(output_source, "        this->Identifier = identifier;\n");
         list_iterator_start(&msg->datas);

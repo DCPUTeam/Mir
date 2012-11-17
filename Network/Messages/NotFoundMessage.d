@@ -1,3 +1,3 @@
-message NotFoundMessage
+global reliable message NotFoundMessage
 {
 };

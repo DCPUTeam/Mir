@@ -16,8 +16,9 @@ namespace Network
     public:
         ObjectMessage(Source source)
             : Message(source) { }
-        ObjectMessage(bool reliable)
-            : Message(reliable) { }
+        ObjectMessage(bool reliable, bool global)
+            : Message(reliable, global) { }
+        virtual ~ObjectMessage() { };
         virtual std::string Serialize() = 0;
         virtual void Deserialize(std::string data) = 0;
         virtual int GetHashCode() = 0;

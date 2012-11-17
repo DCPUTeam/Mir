@@ -1,0 +1,3 @@
+global reliable message LocalObjectNameMessage
+{
+};

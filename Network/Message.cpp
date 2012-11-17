@@ -18,6 +18,7 @@ namespace Network
     {
         this->m_Source = source;
         this->m_Reliable = false;
+        this->m_GlobalHandled = false;
     }
 
     ///
@@ -25,10 +26,11 @@ namespace Network
     ///
     /// @param reliable Whether the message should be sent reliably.
     ///
-    Message::Message(bool reliable)
+    Message::Message(bool reliable, bool global)
     {
         this->m_Source = Source();
         this->m_Reliable = reliable;
+        this->m_GlobalHandled = global;
     }
 
     ///
@@ -37,5 +39,21 @@ namespace Network
     Source Message::GetSource()
     {
         return this->m_Source;
+    }
+    
+    ///
+    /// @brief Returns whether the current message should be reliably transferred.
+    ///
+    bool Message::IsReliable()
+    {
+        return this->m_Reliable;
+    }
+    
+    ///
+    /// @brief Returns whether the current message should be handled globally.
+    ///
+    bool Message::IsGlobal()
+    {
+        return this->m_GlobalHandled;
     }
 }

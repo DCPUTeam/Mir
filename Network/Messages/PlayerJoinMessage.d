@@ -1,3 +1,3 @@
-message PlayerJoinMessage
+global reliable message PlayerJoinMessage
 {
 };

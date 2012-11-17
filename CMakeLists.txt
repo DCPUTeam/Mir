@@ -43,6 +43,8 @@ generate_messages(
     Network/Messages/CreateMessage.d
     Network/Messages/NotFoundMessage.d
     Network/Messages/RepositionMessage.d
+    Network/Messages/GetAllLocalObjectsMessage.d
+    Network/Messages/LocalObjectNameMessage.d
 )
 add_library(mir-network STATIC
     Network/Message.h

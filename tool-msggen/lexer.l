@@ -17,6 +17,12 @@
 #pragma warning(disable:4005;disable:4013;disable:4018)
 #endif
 
+struct flags_option
+{
+    int reliable;
+    int global;
+};
+
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -32,6 +38,8 @@
 
 %%
 
+global                          return KEYWORD_GLOBAL;
+reliable                        return KEYWORD_RELIABLE;
 message                         return KEYWORD_MESSAGE;
 \{                              return BRACKET_OPEN;
 \}                              return BRACKET_CLOSE;

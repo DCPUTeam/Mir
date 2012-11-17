@@ -25,7 +25,11 @@ CachedUniverse* GameplayState::GetUniverse()
 {
     Network::RequestState& state = this->m_Engine->GetNetworkController().Request("universe");
     if (state.Status == Network::REQUEST_STATUS_AVAILABLE)
+    {
+        if (this->m_Engine->GetNetworkController().GetGlobalHandler() != state.Reference)
+            this->m_Engine->GetNetworkController().SetGlobalHandler(state.Reference);
         return (CachedUniverse*)state.Reference;
+    }
     else
         return NULL;
 }
@@ -70,6 +74,9 @@ void GameplayState::Activate()
 
 void GameplayState::Deactivate()
 {
+    // Disconnect the controller global handler.
+    this->m_Engine->GetNetworkController().SetGlobalHandler(NULL);
+    
     // Stop the gameplay rendering engine settings.
     GameplayRenderingEngine::Deinit();
 }

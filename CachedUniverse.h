@@ -14,6 +14,7 @@
 #include "Network/IdentifiableObject.h"
 #include "Network/UpdatableObject.h"
 #include "RenderableObject.h"
+#include "CachedPlayer.h"
 
 ///
 /// @brief Represents a cached universe on the client side.
@@ -21,13 +22,17 @@
 class CachedUniverse : public Network::IdentifiableObject, public Network::UpdatableObject, public RenderableObject
 {
 private:
+    std::list<CachedActor*> m_CachedActors;
+    std::list<CachedShip*> m_CachedShips;
+    std::list<CachedCelestialBody*> m_CachedCelestialBodies;
     Network::Controller* m_Controller;
     bool m_SphereGenerated;
     int m_SphereID;
+    CachedPlayer* GetPlayer();
+    bool m_SendLocalizedRequests;
 
 public:
-    CachedUniverse(Network::Controller& controller, std::string identifier)
-        : Network::IdentifiableObject(controller, identifier), m_SphereGenerated(false) {}
+    CachedUniverse(Network::Controller& controller, std::string identifier);
     virtual void ReceiveMessage(Network::Message& message);
     virtual void Update();
     virtual void Render();

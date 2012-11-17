@@ -1,3 +1,3 @@
-message RequestMessage
+global reliable message RequestMessage
 {
 };
