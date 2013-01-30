@@ -1,15 +1,20 @@
-DCPU-16 Toolchain Game Emulation
+Mir
 =================================
 
-What DCPUGame is:
-------------------
-An emulation environment to fully support the wide range of hardware, including hardware that otherwise only makes sense in a physical space.
+Mir was a project to implement a virtual simulation in which ships with DCPU-16 hardware could be simulated on a large scale; the idea being that developers could safely test their programs under various environments before using them in-game.
 
-What DCPUGame is not:
----------------------
-It is not 0x10c.  Specifically it doesn't focus on game play elements, secure networking or any of those features.
+Unfortunately due to other commitments, we no longer have the resources to bring this to a full implementation (and the last real work that was done on it was for a university project).
 
-Resources:
+Building
 -----------
-Design documents should go in https://docs.google.com/folder/d/0B6IDxhBpjPT0RXJVZEc4ODZGWDA/edit.
-The #0x10c-dcpu-game@irc.freenode.net is used for discussion and development.
+You will need to clone this underneath DCPUToolchain as the "dtgame" folder.  Then just run cmake as normal for the toolchain and it will build the Mir client and server as part of it.
+
+Things that do work
+---------------------
+* Multiplayer infrastructure
+* Rendering and game loop
+
+Things that don't work
+------------------------
+* No DCPU-16 VM emulation hooked in
+* Players and accounts aren't handled properly at all; nor is there an infrastructure for supporting accounts or players when clients join
